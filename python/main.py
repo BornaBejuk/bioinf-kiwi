@@ -18,4 +18,5 @@ if __name__ == '__main__':
     # print (type(overlaps_c_r[0][0]))
 
 
-    print (overlaps_c_r['query_end'])
+    # print (overlaps_c_r['query_end'])
+    print (get_ES(overlaps_c_r))
