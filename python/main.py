@@ -6,6 +6,7 @@ if __name__ == '__main__':
     path_r_r = '../data/EColi-synthetic/overlaps-r-r.paf'
 
     overlaps_c_r = load_data(path_c_r)
+    overlaps_r_r = load_data(path_r_r)
 
     # m = np.argmin(overlaps_r_r[:,10:11].astype(int))
     # print (m)
@@ -19,4 +20,4 @@ if __name__ == '__main__':
 
 
     # print (overlaps_c_r['query_end'])
-    print (get_ES(overlaps_c_r))
+    print (get_ES(overlaps_r_r)[0].shape)
