@@ -10,3 +10,7 @@ def get_SI(overlaps):
 def get_avg_SI(overlaps):
     SI = get_SI(overlaps)
     return SI.mean()
+
+def filter_SI(overlaps, SI_min=0.5):
+    SI = get_SI(overlaps) > SI_min
+    return overlaps[np.repeat(SI,overlaps.shape[1], axis=1)].reshape(-1,overlaps.shape[1])
