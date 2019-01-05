@@ -1,5 +1,5 @@
 import numpy as np
-
+import numpy_indexed as npi
 
 def load_data(path):
     overlaps2 = np.loadtxt(path, delimiter='\t', dtype='str')
@@ -17,10 +17,10 @@ def load_data(path):
                             ('res_matches', float),
                             ('block_len', float),
                             ('map_quality', int),
-                            ('a', 'U25'),
-                            ('b', 'U25'),
-                            ('c', 'U25'),
-                            ('d', 'U25'),
+                            ('OS', float),
+                            ('ES', float),
+                            ('SI', float),
+                            ('extension_side', 'U25'),
                             ])
     for i, row in zip(range(overlaps2.shape[0]),overlaps2):
         overlaps['query_name'][i] = row[0]
@@ -35,10 +35,10 @@ def load_data(path):
         overlaps['res_matches'][i] = row[9]
         overlaps['block_len'][i] = row[10]
         overlaps['map_quality'][i] = row[11]
-        overlaps['a'][i] = row[12]
-        overlaps['b'][i] = row[13]
-        overlaps['c'][i] = row[14]
-        overlaps['d'][i] = row[15]
+        # overlaps['a'][i] = row[12]
+        # overlaps['b'][i] = row[13]
+        # overlaps['c'][i] = row[14]
+        # overlaps['d'][i] = row[15]
 
     overlaps = filter_contained(overlaps)
     overlaps = filter_SI(overlaps)
@@ -71,8 +71,10 @@ def filter_contained(overlaps):
     to_delete = []
     for i in range(overlaps.shape[0]):
         if extend_right(overlaps['query_end'][i], overlaps['query_len'][i], overlaps['target_end'][i], overlaps['target_len'][i]):
+            overlaps['extension_side'][i] = 'right'
             continue
         elif extend_left(overlaps['query_start'][i], overlaps['target_start'][i]):
+            overlaps['extension_side'][i] = 'left'
             continue
         else:
             to_delete.append(i)
@@ -148,3 +150,17 @@ def get_ES(overlaps):
     ES2 = get_OS(overlaps).reshape(-1,1) + .5 * EL1 - 0.5 * (OH1 + OH2)
 
     return ES1, ES2
+
+def append_scores(overlaps):
+    OS = get_OS(overlaps)
+    ES1, ES2 = get_ES(overlaps)
+    SI = get_SI(overlaps)
+    for i in zip(range(overlaps.shape[0])):
+        overlaps['OS'][i] = OS[i]
+        overlaps['ES'][i] = ES2[i][0]
+        overlaps['SI'][i] = SI[i]
+
+    return overlaps
+
+def get_grouped_data(overlaps):
+    return npi.group_by(overlaps['target_name'])
