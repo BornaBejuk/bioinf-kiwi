@@ -29,7 +29,7 @@ if __name__ == '__main__':
 
     grouped_data1 = get_grouped_data(overlaps_r_r)
     keys = grouped_data1.unique
-    grouped_data1 = grouped_data1.split(overlaps_r_r[['query_name','SI','OS','ES']])
+    grouped_data1 = grouped_data1.split(overlaps_r_r[['query_name','SI','OS','ES','extension_side']])
 
     print (keys)
     print (grouped_data1[0])
