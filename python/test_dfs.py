@@ -18,25 +18,27 @@ def dfs(graph, start, goals):
 
 
 # version of dfs that builds the graph as it traverses it
-def dfs_2(start, goals, side, grouped_c_r, keys_c_r, grouped_r_r, keys_r_r):
+def dfs_2(start, goals, side, grouped_c_r, keys_c_r, grouped_r_r, keys_r_r, max_depth = 12):
     graph = dict()
 
     # replace with a function that finds the connecting reads for this anchoring node
-    graph[start] = set(get_n_best_connecting_reads_for_contig(start, grouped_c_r, keys_c_r, side, n = 50))
+    graph[start] = set(get_n_best_connecting_reads_for_contig(start, grouped_c_r, keys_c_r, side, n = 10))
 
     paths_to_goals = []
     stack = [(start, [start])]
     while stack:
         (vertex, path) = stack.pop()
-        if vertex in graph:
-            for next in graph[vertex] - set(path):
-                if next in goals:
-                    paths_to_goals.append(path + [next])
-                else:
-                    stack.append((next, path + [next]))
-                    # find new connecting reads for this node if they exist
-                    # if next in graph:
-                    graph[next] = set(get_n_best_connecting_reads_for_read(next, side, grouped_r_r, keys_r_r, grouped_c_r, keys_c_r))
+        if len(path) <= max_depth:
+            if vertex in graph:
+                for next in graph[vertex] - set(path):
+                    if next in goals:
+                        paths_to_goals.append(path + [next])
+                        print(paths_to_goals)
+                    else:
+                        stack.append((next, path + [next]))
+                        # find new connecting reads for this node if they exist
+                        # if next in graph:
+                        graph[next] = set(get_n_best_connecting_reads_for_read(next, side, grouped_r_r, keys_r_r, grouped_c_r, keys_c_r, n=2))
     return paths_to_goals
 
 
@@ -116,6 +118,7 @@ if __name__ == '__main__':
     # print(grouped_c_r[0][np.where(grouped_c_r[0]['extension_side'] == 'right')])
 
     # test
+    # print(type(keys_c_r))
     start = keys_c_r[0]
     goals = keys_c_r
     side = 'left'
