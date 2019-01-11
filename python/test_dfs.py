@@ -249,12 +249,12 @@ if __name__ == '__main__':
     # keys_r_r = ['read1', 'read2', 'read3']
     start = keys_c_r[2]
     goals = keys_c_r
-    side = 'left'
+    side = 'right'
 
     # # # # print(type(grouped_c_r))
     # paths = dfs_2(start, goals, side, grouped_c_r, keys_c_r, grouped_r_r, keys_r_r, max_depth=50, monte_carlo=True)
     paths = try_monte_carlo(start, goals, side, grouped_c_r, keys_c_r, grouped_r_r, keys_r_r, max_depth=50, n_times = 1000)
 
-    with open('mc_ctg3_left', 'wb') as pahts_right_side_file:
+    with open('mc_ctg3_right', 'wb') as pahts_right_side_file:
         pickle.dump(paths, pahts_right_side_file)
     print(paths)

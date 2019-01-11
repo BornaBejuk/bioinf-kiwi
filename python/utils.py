@@ -5,12 +5,12 @@ def load_data(path):
     overlaps2 = np.loadtxt(path, delimiter='\t', dtype='str')
 
     overlaps = np.recarray(shape=(overlaps2.shape[0],),
-                     dtype=[('query_name', 'U25'),
+                     dtype=[('query_name', 'U250'),
                             ('query_len', int),
                             ('query_start', float),
                             ('query_end', float),
                             ('strand', 'U25'),
-                            ('target_name', 'U25'),
+                            ('target_name', 'U250'),
                             ('target_len', int),
                             ('target_start', float),
                             ('target_end', float),
@@ -21,6 +21,8 @@ def load_data(path):
                             ('ES', float),
                             ('SI', float),
                             ('extension_side', 'U25'),
+                            ('EL', tuple),
+                            ('OH', tuple),
                             ])
     for i, row in zip(range(overlaps2.shape[0]),overlaps2):
         overlaps['query_name'][i] = row[0]
@@ -160,6 +162,19 @@ def append_scores(overlaps):
         overlaps['ES'][i] = ES2[i][0]
         overlaps['SI'][i] = SI[i]
 
+    return overlaps
+
+def append_scores2(overlaps):
+    el = get_EL(overlaps)
+    # print(el)
+    # print(len(el))
+    # print(el.shape)
+    oh = get_OH(overlaps)
+    for i in range(overlaps.shape[0]):
+        # print(el[i][0][0], el[i][1][0])
+        overlaps['EL'][i] = (el[0][i][0], el[1][i][0])
+        # print(overlaps['EL'][i])
+        overlaps['OH'][i] = (oh[0][i][0], oh[1][i][0])
     return overlaps
 
 def get_grouped_data(overlaps):
