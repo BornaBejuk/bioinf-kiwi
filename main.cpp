@@ -42,15 +42,15 @@ int main() {
     filterBySI(SImin, queryNames, queryLens, queryStarts, queryEnds, targetNames, targetLens, targetStarts, targetEnds, resMatches, blockLens, extensionSides, SI);
     calculateOL(OL1, OL2, queryStarts, queryEnds, targetStarts, targetEnds);
     calculateOH(OH1, OH2, queryLens, queryStarts, queryEnds, targetLens, targetStarts, targetEnds, extensionSides);
-    calculateOH(EL1, EL2, queryLens, queryStarts, queryEnds, targetLens, targetStarts, targetEnds, extensionSides);
+    calculateEL(EL1, EL2, queryLens, queryStarts, queryEnds, targetLens, targetStarts, targetEnds, extensionSides);
     calculateOS(OS, OL1, OL2, SI);
     calculateES(ES1, ES2, OS, EL1, EL2, OH1, OH2);
     // cout << queryLens[0] << '\n';
     // cout << targetLens[0] << '\n';
     // cout << extensionSides[0] << '\n';
     // cout << OL1[0] << '\n';
-    // cout << OH1[0] << '\n';
-    // cout << EL1[0] << '\n';
+    // cout << OH1[0] << ' ' << OH2[0] << '\n';
+    // cout << EL1[0] << ' ' << EL2[0] << '\n';
     // cout << SI[0] << '\n';
 
     return 0;
