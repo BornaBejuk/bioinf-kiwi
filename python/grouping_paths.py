@@ -4,7 +4,7 @@ import numpy as np
 def divide_paths_into_anchor_groups(list_of_list_of_paths):
     map_of_paths = dict()
     for l in list_of_list_of_paths:
-        for p in l:
+        for p in set(l):
             path = p[0]
             start_contig = path[0]
             end_contig = path[-1]
@@ -59,6 +59,55 @@ def get_all_lengths(map_of_paths, lengths_of_contigs, grouped_c_r, grouped_r_r, 
     return map_of_lengths
 
 
+def divide_paths_into_groups(map_of_lengths, limit):
+    map_of_groups = dict()
+    for m in map_of_lengths:
+        paths = map_of_lengths[m]
+        path_lengths = [path[1] for path in paths]
+        path_lengths_sorted = sorted(path_lengths)
+        lowest = path_lengths_sorted[0]
+        highest = path_lengths_sorted[-1]
+        groups = [[] for i in range(len(paths))]
+        group_window = (highest - lowest) / len(paths)
+        if len(map_of_lengths[m]) < limit:
+            first_group = map_of_lengths[m]
+            map_of_groups[m] = [first_group]
+            continue
+        for path in paths:
+            length = path[1]
+            # da se ovaj najveci (highest) ne nadje uvijek sam u zadnjoj grupi
+            if length == highest:
+                length -= 1
+            length = length - lowest
+            position = int(length // group_window)
+            groups[position].append(path)
+        map_of_groups[m] = groups
+    return map_of_groups
+
+
+def choose_path_from_groups(map_of_groups):
+    map_of_chosen_paths = dict()
+    for m in map_of_groups:
+        groups = map_of_groups[m]
+
+        # uzmi grupu iz groups
+        list_of_group_sizes = []
+        for group in groups:
+            list_of_group_sizes.append(len(group))
+
+        # ako ih je vise koji su jednako veliki, argmax vraca prvi koji ima tu max velicinu
+        # sto i zelim, pripazit na to
+        max_indeks = np.argmax(list_of_group_sizes)
+        paths = groups[max_indeks]
+
+        length = len(paths)
+        paths.sort(key = lambda x:x[1])
+        index = length // 2
+        
+        map_of_chosen_paths[m] = paths[index]
+    return map_of_chosen_paths
+
+    
 
 
 if __name__ == '__main__':
@@ -72,6 +121,7 @@ if __name__ == '__main__':
     #     mc_ctg1_left_2 = pickle.load(mc_ctg1_right_file)
     # with open('mc_ctg1_left_3', 'rb') as mc_ctg1_right_file:
     #     mc_ctg1_left_3 = pickle.load(mc_ctg1_right_file)
+    # print(mc_ctg1_left_3)
     # with open('mc_ctg2_left', 'rb') as mc_ctg1_right_file:
     #     mc_ctg2_left = pickle.load(mc_ctg1_right_file)
     # with open('mc_ctg2_right', 'rb') as mc_ctg1_right_file:
@@ -97,25 +147,50 @@ if __name__ == '__main__':
     #     pickle.dump(mapa, mc_ctg1_right_file)
 
     # treba na neki nacin dobit
-    lengths_of_contigs = {'ctg1':1000000, 'ctg2':1800000, 'ctg3':1541652}
+    # lengths_of_contigs = {'ctg1':1000000, 'ctg2':1800000, 'ctg3':1541652}
 
-    with open('map_of_paths', 'rb') as mc_ctg1_right_file:
-        map_of_paths = pickle.load(mc_ctg1_right_file)
-    with open('grouped_data_c_r_2', 'rb') as mc_ctg1_right_file:
-        grouped_c_r = pickle.load(mc_ctg1_right_file)
-    # print(grouped_c_r[0])
-    with open('keys_c_r', 'rb') as mc_ctg1_right_file:
-        keys_c_r = pickle.load(mc_ctg1_right_file)
-    with open('grouped_data_r_r_2', 'rb') as mc_ctg1_right_file:
-        grouped_r_r = pickle.load(mc_ctg1_right_file)
-    with open('keys_r_r', 'rb') as mc_ctg1_right_file:
-        keys_r_r = pickle.load(mc_ctg1_right_file)
-    # print(map_of_paths['ctg1ctg2'])
-    # print(keys_c_r)
-    map_of_lengths = get_all_lengths(map_of_paths, lengths_of_contigs, grouped_c_r, grouped_r_r, keys_c_r, keys_r_r)
-    print(map_of_lengths['ctg1ctg2'])
-    with open('map_of_lengths', 'wb') as grouped_data_file:
-        pickle.dump(map_of_lengths, grouped_data_file)
+    # with open('map_of_paths', 'rb') as mc_ctg1_right_file:
+    #     map_of_paths = pickle.load(mc_ctg1_right_file)
+    # with open('grouped_data_c_r_2', 'rb') as mc_ctg1_right_file:
+    #     grouped_c_r = pickle.load(mc_ctg1_right_file)
+    # # print(grouped_c_r[0])
+    # with open('keys_c_r', 'rb') as mc_ctg1_right_file:
+    #     keys_c_r = pickle.load(mc_ctg1_right_file)
+    # with open('grouped_data_r_r_2', 'rb') as mc_ctg1_right_file:
+    #     grouped_r_r = pickle.load(mc_ctg1_right_file)
+    # with open('keys_r_r', 'rb') as mc_ctg1_right_file:
+    #     keys_r_r = pickle.load(mc_ctg1_right_file)
+    # # print(map_of_paths['ctg1ctg2'])
+    # # print(keys_c_r)
+    # print(map_of_paths)
+    # map_of_lengths = get_all_lengths(map_of_paths, lengths_of_contigs, grouped_c_r, grouped_r_r, keys_c_r, keys_r_r)
+    # print(map_of_lengths['ctg1ctg2'])
+    # with open('map_of_lengths', 'wb') as grouped_data_file:
+    #     pickle.dump(map_of_lengths, grouped_data_file)
+
+
+
+    with open('map_of_lengths', 'rb') as grouped_data_file:
+        map_of_lengths = pickle.load(grouped_data_file)
+    map_of_groups = divide_paths_into_groups(map_of_lengths, 10)
+    # print(map_of_groups['ctg1ctg3'])
+    # for g in map_of_groups['ctg1ctg2']:
+    #     print(g)
+    #     print('\n')
+    map_of_chosen_paths = choose_path_from_groups(map_of_groups)
+    print(map_of_chosen_paths)
+    # mapa = map_of_lengths['ctg1ctg2']
+    # list_of_lengths = []
+    # for path in mapa:
+    #     print(path)
+    #     list_of_lengths.append(path[1])
+    # print(sorted(list_of_lengths))
+    # print(len(list_of_lengths))
+    # print(len(np.unique(list_of_lengths)))
+
+
+
+
     # print(map['ctg2ctg3'])
     # for key in map:
     #     print(key)
