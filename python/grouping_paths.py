@@ -2,9 +2,31 @@ import pickle
 import numpy as np
 
 def divide_paths_into_anchor_groups(list_of_list_of_paths):
+    '''Takes as input an object that is in format:
+        [ [ [path1], ..., [pathN] ],
+          [ [path1]], ...,[pathN] ],
+          ...
+          [ [path1], ...,[pathN] ] ]
+    where e.g. path1 == ['ctg1', 'read1', 'ctg2']
+    Same as before, paths do not have to be inside list. i.e. input should probably look like
+    [ [ path1, ..., pathN],
+      [ path1, ..., pathN],
+      ...
+      [ path1, ..., pathN] ]
+     That syntax was left over from first two approaches. 
+     That can be changed if wanted when rewriting in cpp.
+
+    Method outputs a map, e.g.
+        {'ctg1ctg2': [[path1],..., [pathN]],
+         'ctg1ctg3': [[path1],..., [pathN]],
+         'ctg2ctg3': [[path1],..., [pathN]]}
+    The goal of the method is to group all paths so that paths between same contigs are put together.
+    This method could be modified so that the keys are tuples (ctg1, ctg2)
+    instead of a string 'ctgctg2'.
+    '''
     map_of_paths = dict()
     for l in list_of_list_of_paths:
-        for p in set(l):
+        for p in l:
             path = p[0]
             start_contig = path[0]
             end_contig = path[-1]
@@ -19,6 +41,13 @@ def divide_paths_into_anchor_groups(list_of_list_of_paths):
 
 
 def get_all_lengths(map_of_paths, lengths_of_contigs, grouped_c_r, grouped_r_r, keys_c_r, keys_r_r):
+    '''
+    Takes as input a map of paths that the method 'divide_paths_into_anchor_groups' produced 
+    and outputs a map in format:
+    {'ctg1ctg2': [(path1, len_of_path1), ..., (pathN, len_of_pathN)],
+     'ctg1ctg3': [(path1, len_of_path1), ..., (pathN, len_of_pathN)],
+     'ctg2ctg3': [(path1, len_of_path1), ..., (pathN, len_of_pathN)]}
+    '''
     map_of_lengths = dict()
     for m in map_of_paths:
         for path in map_of_paths[m]:
@@ -60,6 +89,14 @@ def get_all_lengths(map_of_paths, lengths_of_contigs, grouped_c_r, grouped_r_r, 
 
 
 def divide_paths_into_groups(map_of_lengths, limit):
+    '''
+    Takes as input a map of lengths that the method 'get_all_lengths' produced 
+    and outputs a map in format:
+    {'ctg1ctg2': [group1, group2, ..., groupN],
+     'ctg1ctg3': [group1, group2, ..., groupN],
+     'ctg2ctg3': [group1, group2, ..., groupN]}
+     where a group is a list of (path, len_of_path) tuples.
+    '''
     map_of_groups = dict()
     for m in map_of_lengths:
         paths = map_of_lengths[m]
@@ -86,6 +123,14 @@ def divide_paths_into_groups(map_of_lengths, limit):
 
 
 def choose_path_from_groups(map_of_groups):
+    '''
+    Takes as input a map of groups that the method 'divide_paths_into_groups' produced 
+    and outputs a map in format:
+    {'ctg1ctg2': chosen_path,
+     'ctg1ctg3': chosen_path,
+     'ctg2ctg3': chosen_path}
+     where chosen path is a tuple (path, len_of_path)
+    '''
     map_of_chosen_paths = dict()
     for m in map_of_groups:
         groups = map_of_groups[m]
