@@ -5,14 +5,14 @@
 
 using namespace std;
 
-void loadData(vector<string> &queryNames, vector<int> &queryLens, vector<float> &queryStarts,
+void loadData(string path, vector<string> &queryNames, vector<int> &queryLens, vector<float> &queryStarts,
             vector<float> &queryEnds, vector<string> &targetNames, vector<int> &targetLens,
             vector<float> &targetStarts, vector<float> &targetEnds, vector<float> &resMatches,
-            vector<float> &blockLens) {
+            vector<float> &blockLens, vector<float> &SI, float SImin) {
 
     string line;
 
-    ifstream inputFile("data/EColi-synthetic/overlaps-c-r.paf");
+    ifstream inputFile(path);
 
     if (inputFile.good()) {
         int current_number = 0;
@@ -35,17 +35,21 @@ void loadData(vector<string> &queryNames, vector<int> &queryLens, vector<float> 
 
             linestream >> qLen >> qStart >> qEnd >> strand >> tName >> tLen >> tStart >> tEnd >> resMatch >> bLen;
 
-            queryNames.push_back(qName);
-            queryLens.push_back(qLen);
-            queryStarts.push_back(qStart);
-            queryEnds.push_back(qEnd);
-            targetLens.push_back(tLen);
-            targetNames.push_back(tName);
-            targetStarts.push_back(tStart);
-            targetEnds.push_back(tEnd);
-            resMatches.push_back(resMatch);
-            blockLens.push_back(bLen);
+            int si = resMatch / bLen;
 
+            if( si > SImin) {
+                queryNames.push_back(qName);
+                queryLens.push_back(qLen);
+                queryStarts.push_back(qStart);
+                queryEnds.push_back(qEnd);
+                targetLens.push_back(tLen);
+                targetNames.push_back(tName);
+                targetStarts.push_back(tStart);
+                targetEnds.push_back(tEnd);
+                resMatches.push_back(resMatch);
+                blockLens.push_back(bLen);
+                SI.push_back(si);
+            }
         }
     }
 }
@@ -61,15 +65,13 @@ bool extendLeft(float queryStart, float targetStart) {
 void filterContained(vector<string> &queryNames, vector<int> &queryLens, vector<float> &queryStarts,
             vector<float> &queryEnds, vector<string> &targetNames, vector<int> &targetLens,
             vector<float> &targetStarts, vector<float> &targetEnds, vector<float> &resMatches,
-            vector<float> &blockLens, vector<string> &extensionSides) {
-
-    vector<int> toDeleteIndices;
+            vector<float> &blockLens, vector<float> &extensionSides) {
 
     for( int i = 0; i < queryNames.size(); i++) {
         if( extendRight(queryEnds[i], queryLens[i], targetEnds[i], targetLens[i])) {
-            extensionSides.push_back("right");
+            extensionSides.push_back(1);
         } else if( extendLeft(queryStarts[i], targetStarts[i])) {
-            extensionSides.push_back("left");
+            extensionSides.push_back(0);
         } else {
             queryNames.erase(queryNames.begin() + i);
             queryLens.erase(queryLens.begin() + i);
@@ -97,10 +99,13 @@ void calculateSI(vector<float> &SI, vector<float> &resMatches, vector<float> &bl
 void filterBySI(float SImin, vector<string> &queryNames, vector<int> &queryLens, vector<float> &queryStarts,
             vector<float> &queryEnds, vector<string> &targetNames, vector<int> &targetLens,
             vector<float> &targetStarts, vector<float> &targetEnds, vector<float> &resMatches,
-            vector<float> &blockLens, vector<string> &extensionSides, vector<float> SI) {
+            vector<float> &blockLens, vector<float> &extensionSides, vector<float> SI) {
 
+    // vector<string> names;
+    // copy_if (queryNames.begin(), queryNames.end(), std::back_inserter(names), [](int i){return i>=0;} );
     for( int i = 0; i < queryStarts.size(); i++) {
         if( SI[i] < SImin ) {
+
             queryNames.erase(queryNames.begin() + i);
             queryLens.erase(queryLens.begin() + i);
             queryStarts.erase(queryStarts.begin() + i);
@@ -109,8 +114,8 @@ void filterBySI(float SImin, vector<string> &queryNames, vector<int> &queryLens,
             targetNames.erase(targetNames.begin() + i);
             targetStarts.erase(targetStarts.begin() + i);
             targetEnds.erase(targetEnds.begin() + i);
-            resMatches.erase(resMatches.begin() + i);
-            blockLens.erase(blockLens.begin() + i);
+            // resMatches.erase(resMatches.begin() + i);
+            // blockLens.erase(blockLens.begin() + i);
             extensionSides.erase(extensionSides.begin() + i);
             SI.erase(SI.begin() + i);
             --i;
@@ -127,10 +132,10 @@ void calculateOL(vector<float> &OL1, vector<float> &OL2, vector<float> &querySta
 }
 
 void calculateOH(vector<float> &OH1, vector<float> &OH2, vector<int> &queryLens, vector<float> &queryStarts, vector<float> &queryEnds,
-    vector<int> &targetLens, vector<float> &targetStarts, vector<float> &targetEnds, vector<string> &extensionSides) {
+    vector<int> &targetLens, vector<float> &targetStarts, vector<float> &targetEnds, vector<float> &extensionSides) {
 
     for( int i = 0; i < targetLens.size(); i++) {
-        if( extensionSides[i] == "right") {
+        if( extensionSides[i] == 1) {
             OH1.push_back(queryStarts[i]);
             OH2.push_back(targetLens[i] - targetEnds[i] - 1);
         } else {
@@ -141,10 +146,10 @@ void calculateOH(vector<float> &OH1, vector<float> &OH2, vector<int> &queryLens,
 }
 
 void calculateEL(vector<float> &EL1, vector<float> &EL2, vector<int> &queryLens, vector<float> &queryStarts, vector<float> &queryEnds,
-    vector<int> &targetLens, vector<float> &targetStarts, vector<float> &targetEnds, vector<string> &extensionSides) {
+    vector<int> &targetLens, vector<float> &targetStarts, vector<float> &targetEnds, vector<float> &extensionSides) {
 
     for( int i = 0; i < targetLens.size(); i++) {
-        if( extensionSides[i] == "right") {
+        if( extensionSides[i] == 1) {
             EL1.push_back(queryLens[i] - queryEnds[i] - 1);
             EL2.push_back(targetStarts[i]);
         } else {

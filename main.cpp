@@ -5,11 +5,15 @@
 #include <map>
 
 #include "utils.h"
+#include "monteCarlo.h"
 
 using namespace std;
 
 int main() {
-    // cout << "Hellou" << endl;
+
+    string pathCR = "data/EColi-synthetic/overlaps-c-r.paf";
+    string pathRR = "data/EColi-synthetic/overlaps-r-r.paf";
+
     vector<string> queryNames;
     vector<int> queryLens;
     vector<float> queryStarts;
@@ -23,7 +27,7 @@ int main() {
     vector<float> resMatches;
     vector<float> blockLens;
 
-    vector<string> extensionSides;
+    vector<float> extensionSides; // 1 is right, 0 is left
     vector<float> SI;
     float SImin = 0.9;
     vector<float> OL1;
@@ -36,7 +40,7 @@ int main() {
     vector<float> ES1;
     vector<float> ES2;
 
-    loadData(queryNames, queryLens, queryStarts, queryEnds, targetNames, targetLens, targetStarts, targetEnds, resMatches, blockLens);
+    loadData(pathCR, queryNames, queryLens, queryStarts, queryEnds, targetNames, targetLens, targetStarts, targetEnds, resMatches, blockLens, SI, SImin);
     filterContained(queryNames, queryLens, queryStarts, queryEnds, targetNames, targetLens, targetStarts, targetEnds, resMatches, blockLens, extensionSides);
 
     calculateSI(SI, resMatches, blockLens);
@@ -47,17 +51,95 @@ int main() {
     calculateOS(OS, OL1, OL2, SI);
     calculateES(ES1, ES2, OS, EL1, EL2, OH1, OH2);
 
-    map<string, map<string, vector<float> > > proba;
-    proba[targetNames[0]][queryNames[0]].push_back(ES1[0]);
-    for( auto x : proba){
-        cout << x.first << " contains:" << endl;
-        for( auto y : x.second){
-            cout << y.first << ':' << y.second[0] << '\n';
-            // cout << y.second << '\n';
-        }
-    //     cout << x.first << ' '  << x.second << ' ' << '\n';
+    map<string, map<string, vector<vector<float> > > > groupedCR;
+    for( int i = 0; i < queryNames.size(); i++) {
+        vector<float> tmp = {extensionSides[i], ES2[i], OH1[i], OH2[i], EL1[i], EL2[i]};
+        groupedCR[targetNames[i]][queryNames[i]].push_back(tmp);
     }
-    cout << proba[targetNames[0]][queryNames[0]][0] << '\n';
+    vector<string> keysCR;
+    for( auto key : groupedCR) {
+        keysCR.push_back(key.first);
+    }
+
+    cout << "CR loaded" << endl;
+
+    queryNames.clear();
+    queryLens.clear();
+    queryStarts.clear();
+    queryEnds.clear();
+
+    targetNames.clear();
+    targetLens.clear();
+    targetStarts.clear();
+    targetEnds.clear();
+
+    resMatches.clear();
+    blockLens.clear();
+
+    extensionSides.clear();
+    SI.clear();
+    OL1.clear();
+    OL2.clear();
+    OH1.clear();
+    OH2.clear();
+    EL1.clear();
+    EL2.clear();
+    OS.clear();
+    ES1.clear();
+    ES2.clear();
+
+    loadData(pathRR, queryNames, queryLens, queryStarts, queryEnds, targetNames, targetLens, targetStarts, targetEnds, resMatches, blockLens, SI, SImin);
+
+    filterContained(queryNames, queryLens, queryStarts, queryEnds, targetNames, targetLens, targetStarts, targetEnds, resMatches, blockLens, extensionSides);
+    // calculateSI(SI, resMatches, blockLens);
+    // cout << "SI loaded" << endl;
+    // filterBySI(0.3, queryNames, queryLens, queryStarts, queryEnds, targetNames, targetLens, targetStarts, targetEnds, resMatches, blockLens, extensionSides, SI);
+
+    calculateOL(OL1, OL2, queryStarts, queryEnds, targetStarts, targetEnds);
+    calculateOH(OH1, OH2, queryLens, queryStarts, queryEnds, targetLens, targetStarts, targetEnds, extensionSides);
+    calculateEL(EL1, EL2, queryLens, queryStarts, queryEnds, targetLens, targetStarts, targetEnds, extensionSides);
+    calculateOS(OS, OL1, OL2, SI);
+    calculateES(ES1, ES2, OS, EL1, EL2, OH1, OH2);
+
+    map<string, map<string, vector<vector<float> > > > groupedRR;
+    for( int i = 0; i < queryNames.size(); i++) {
+        vector<float> tmp = {extensionSides[i], ES2[i], OH1[i], OH2[i], EL1[i], EL2[i]};
+        groupedRR[targetNames[i]][queryNames[i]].push_back(tmp);
+    }
+
+    vector<string> keysRR;
+    for( auto key : groupedRR) {
+        keysCR.push_back(key.first);
+    }
+
+    cout << "RR loaded" << endl;
+
+    // for( auto x : groupedCR){
+    //     cout << x.first << " contains:" << endl;
+    //     for( auto y : x.second){
+    //         cout << y.first << ':' << y.second[0][1] << '\n';
+    //         // cout << y.second << '\n';
+    //         break;
+    //     }
+    //     break;
+    // //     cout << x.first << ' '  << x.second << ' ' << '\n';
+    // }
+    //
+    // for( auto x : groupedRR){
+    //     cout << x.first << " contains:" << endl;
+    //     for( auto y : x.second){
+    //         cout << y.first << ':' << y.second[0][1] << '\n';
+    //         // cout << y.second << '\n';
+    //         break;
+    //     }
+    //     break;
+    // //     cout << x.first << ' '  << x.second << ' ' << '\n';
+    // }
+
+    vector<vector<string> > allPaths;
+    int maxDepth = 100;
+    allPaths = monteCarlo(keysCR[0], 1, keysCR, groupedCR, keysRR, groupedRR, maxDepth);
+    // cout << proba[targetNames[0]][queryNames[0]][0] << '\n';
     // cout << queryLens[0] << '\n';
     // cout << targetLens[0] << '\n';
     // cout << extensionSides[0] << '\n';

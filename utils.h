@@ -2,15 +2,15 @@
 
 using namespace std;
 
-void loadData(vector<string> &queryNames, vector<int> &queryLens, vector<float> &queryStarts,
+void loadData(string path, vector<string> &queryNames, vector<int> &queryLens, vector<float> &queryStarts,
             vector<float> &queryEnds, vector<string> &targetNames, vector<int> &targetLens,
             vector<float> &targetStarts, vector<float> &targetEnds, vector<float> &resMatches,
-            vector<float> &blockLens);
+            vector<float> &blockLens, vector<float> &SI, float SImin);
 
 void filterContained(vector<string> &queryNames, vector<int> &queryLens, vector<float> &queryStarts,
             vector<float> &queryEnds, vector<string> &targetNames, vector<int> &targetLens,
             vector<float> &targetStarts, vector<float> &targetEnds, vector<float> &resMatches,
-            vector<float> &blockLens, vector<string> &extensionSides);
+            vector<float> &blockLens, vector<float> &extensionSides);
 
 void calculateScores(vector<float> &OS, vector<float> &ES, vector<float> &SI, vector<float> &EL,
                     vector<float> &OH, vector<float> &resMatches, vector<float> &blockLens);
@@ -20,15 +20,15 @@ void calculateSI(vector<float> &SI, vector<float> &resMatches, vector<float> &bl
 void filterBySI(float SImin, vector<string> &queryNames, vector<int> &queryLens, vector<float> &queryStarts,
             vector<float> &queryEnds, vector<string> &targetNames, vector<int> &targetLens,
             vector<float> &targetStarts, vector<float> &targetEnds, vector<float> &resMatches,
-            vector<float> &blockLens, vector<string> &extensionSides, vector<float> SI);
+            vector<float> &blockLens, vector<float> &extensionSides, vector<float> SI);
 
 void calculateOL(vector<float> &OL1, vector<float> &OL2, vector<float> &queryStarts, vector<float> &queryEnds, vector<float> &targetStarts, vector<float> &targetEnds);
 
 void calculateOH(vector<float> &OH1, vector<float> &OH2, vector<int> &queryLens, vector<float> &queryStarts, vector<float> &queryEnds,
-    vector<int> &targetLens, vector<float> &targetStarts, vector<float> &targetEnds, vector<string> &extensionSides);
+    vector<int> &targetLens, vector<float> &targetStarts, vector<float> &targetEnds, vector<float> &extensionSides);
 
 void calculateEL(vector<float> &EL1, vector<float> &EL2, vector<int> &queryLens, vector<float> &queryStarts, vector<float> &queryEnds,
-        vector<int> &targetLens, vector<float> &targetStarts, vector<float> &targetEnds, vector<string> &extensionSides);
+        vector<int> &targetLens, vector<float> &targetStarts, vector<float> &targetEnds, vector<float> &extensionSides);
 
 void calculateOS(vector<float> &OS, vector<float> &OL1, vector<float> &OL2, vector<float> &SI);
 
