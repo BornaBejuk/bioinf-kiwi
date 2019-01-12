@@ -53,16 +53,27 @@ def find_connections(connections):
     for i in connections:
         pairs.append((i[0], i[-1]))
 
-    result = connect_pairs_into_result(pairs)
+    results = connect_pairs_into_result(pairs)
+    result = results[0]
+    print(result)
     final_path = []
+    #print(connections)
+    #print(len(result))
     for i in range(1, len(result)):
         for c in connections:
+            #final_path.append(result[i-1])
             if result[i-1] == c[0] and result[i] == c[-1]:
                 if i != len(result)-1:
                     final_path += c[:-1]
                 else:
                     final_path += c
+            elif result[i-1] == c[-1] and result[i] == c[0]:
+                if i != len(result)-1:
+                    final_path += c[::-1][:-1]
+                else:
+                    final_path += c[::-1]
 
+    print(final_path)
     return final_path
 
 

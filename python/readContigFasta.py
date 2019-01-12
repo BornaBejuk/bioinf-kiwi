@@ -58,12 +58,12 @@ def createReadingLists(reads_filename, contigs_filename):
 
 def createFastaReference(connections, names, reads):
 
-    results = find_connections(connections) #connections je bejukov ulaz tipa ['ctg1', 'reads001', 'reads007', 'reads000', 'ctg2']
-
-    result_names = results[0] # ili neki drugi odabir
+    results = find_connections(connections) #connections je bejukov ulaz tipa ['ctg1', 'read00001', 'read00007', 'read00002', 'ctg2']
+    #print(results)
+    result_names = results # ili neki drugi odabir
     result_reads = []
-    print(result_names)
-    print(names)
+    #print(result_names)
+    #print(names)
     for i in result_names:
         result_reads.append(reads[names.index(i)]) ## e sad, njih treba spojiti, prema onim fjama iz utils-a.
 
@@ -83,7 +83,8 @@ def create_solution(reads_filename, contigs_filename, read_pairs):
 def example():
     reads = "C:\\Users\Mario\Desktop\Bioinformatika-scaffolding\EColi-synthetic\ecoli_test_reads.fasta"
     contigs = "C:\\Users\Mario\Desktop\Bioinformatika-scaffolding\EColi-synthetic\ecoli_test_contigs.fasta"
-    pairs = [("read00001", "ctg1"), ("ctg2", "ctg1"), ("ctg3", "ctg2"), ("ctg3", "ctg1")]
-    create_solution(reads, contigs, pairs)
+    input = [['ctg1', 'read00001', 'read00007', 'read00002', 'ctg2'],
+             ["ctg3", 'read00002', 'read00004', 'read00006', "ctg1"], ["ctg3",  'read00001', 'read00007', 'read00002', "ctg2"]]
+    create_solution(reads, contigs, input)
 
 example()
