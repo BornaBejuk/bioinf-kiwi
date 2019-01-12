@@ -2,6 +2,8 @@
 #include <fstream>
 #include <vector>
 #include <sstream>
+#include <map>
+
 #include "utils.h"
 
 using namespace std;
@@ -35,9 +37,8 @@ int main() {
     vector<float> ES2;
 
     loadData(queryNames, queryLens, queryStarts, queryEnds, targetNames, targetLens, targetStarts, targetEnds, resMatches, blockLens);
-    cout << queryEnds.size() << '\n';
     filterContained(queryNames, queryLens, queryStarts, queryEnds, targetNames, targetLens, targetStarts, targetEnds, resMatches, blockLens, extensionSides);
-    cout << queryEnds.size() << '\n';
+
     calculateSI(SI, resMatches, blockLens);
     filterBySI(SImin, queryNames, queryLens, queryStarts, queryEnds, targetNames, targetLens, targetStarts, targetEnds, resMatches, blockLens, extensionSides, SI);
     calculateOL(OL1, OL2, queryStarts, queryEnds, targetStarts, targetEnds);
@@ -45,6 +46,18 @@ int main() {
     calculateEL(EL1, EL2, queryLens, queryStarts, queryEnds, targetLens, targetStarts, targetEnds, extensionSides);
     calculateOS(OS, OL1, OL2, SI);
     calculateES(ES1, ES2, OS, EL1, EL2, OH1, OH2);
+
+    map<string, map<string, vector<float> > > proba;
+    proba[targetNames[0]][queryNames[0]].push_back(ES1[0]);
+    for( auto x : proba){
+        cout << x.first << " contains:" << endl;
+        for( auto y : x.second){
+            cout << y.first << ':' << y.second[0] << '\n';
+            // cout << y.second << '\n';
+        }
+    //     cout << x.first << ' '  << x.second << ' ' << '\n';
+    }
+    cout << proba[targetNames[0]][queryNames[0]][0] << '\n';
     // cout << queryLens[0] << '\n';
     // cout << targetLens[0] << '\n';
     // cout << extensionSides[0] << '\n';
