@@ -56,16 +56,16 @@ def createReadingLists(reads_filename, contigs_filename):
     return names, reads
 
 
-def createFastaReference(read_pairs, names, reads):
+def createFastaReference(connections, names, reads):
 
-    results = connect_into_fasta(read_pairs)
+    results = find_connections(connections) #connections je bejukov ulaz tipa ['ctg1', 'reads001', 'reads007', 'reads000', 'ctg2']
 
     result_names = results[0] # ili neki drugi odabir
     result_reads = []
     print(result_names)
     print(names)
     for i in result_names:
-        result_reads.append(reads[names.index(i)])
+        result_reads.append(reads[names.index(i)]) ## e sad, njih treba spojiti, prema onim fjama iz utils-a.
 
     file = open("Reference.fasta", "w")
     title = ">Result\n"

@@ -47,7 +47,27 @@ print(put5)
 ###idemo ucitat continge
 #znaci dobit cu [(ctg1, ctg2), (r1, r0), (r1, ctg0)]
 
-def connect_into_fasta(reads):
+def find_connections(connections):
+    # create pairs
+    pairs = []
+    for i in connections:
+        pairs.append((i[0], i[-1]))
+
+    result = connect_pairs_into_result(pairs)
+    final_path = []
+    for i in range(1, len(result)):
+        for c in connections:
+            if result[i-1] == c[0] and result[i] == c[-1]:
+                if i != len(result)-1:
+                    final_path += c[:-1]
+                else:
+                    final_path += c
+
+    return final_path
+
+
+
+def connect_pairs_into_result(reads): # ovo radi s parovima, a ja trebam prvo napraviti parove
     #length = 0
     path0 = []
     paths1 = []
@@ -75,6 +95,4 @@ def connect_into_fasta(reads):
             if i[::-1] not in result:
                 result.append(i)
     return result
-
-print(connect_into_fasta(continzi))
 
