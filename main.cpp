@@ -6,6 +6,7 @@
 
 #include "utils.h"
 #include "monteCarlo.h"
+#include "selectPaths.h"
 
 using namespace std;
 
@@ -153,6 +154,21 @@ int main() {
     //     }
     // }
 
+    map<tuple<string, string>, vector<vector<tuple<string, int> > > >  pathsMap;
+    pathsMap = mapPaths(0.0, paths);
+
+    // string read;
+    // int number;
+    // for( auto key : pathsMap){
+    //     cout << get<0>(key.first) << " " << get<1>(key.first) << " paths:" << endl;
+    //     for( auto p : key.second){
+    //         for( auto element : p) {
+    //             tie(read, number) = element;
+    //             cout << read << " " << number << '\n';
+    //         }
+    //         cout << endl;
+    //     }
+    // }
 
     // allPaths = monteCarlo(keysCR[2], 0, keysCR, groupedCR, keysRR, groupedRR, maxDepth);
     // cout << proba[targetNames[0]][queryNames[0]][0] << '\n';
