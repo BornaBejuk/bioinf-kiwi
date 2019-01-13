@@ -109,7 +109,7 @@ int main() {
 
     vector<string> keysRR;
     for( auto key : groupedRR) {
-        keysCR.push_back(key.first);
+        keysRR.push_back(key.first);
     }
 
     cout << "RR loaded" << endl;
@@ -136,9 +136,9 @@ int main() {
     // //     cout << x.first << ' '  << x.second << ' ' << '\n';
     // }
 
-    vector<vector<string> > allPaths;
-    int maxDepth = 100;
-    allPaths = monteCarlo(keysCR[0], 1, keysCR, groupedCR, keysRR, groupedRR, maxDepth);
+    vector<tuple<string, int> > allPaths;
+    int maxDepth = 30;
+    allPaths = monteCarlo(keysCR[1], 0, keysCR, groupedCR, keysRR, groupedRR, maxDepth);
     // cout << proba[targetNames[0]][queryNames[0]][0] << '\n';
     // cout << queryLens[0] << '\n';
     // cout << targetLens[0] << '\n';
