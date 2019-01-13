@@ -54,7 +54,7 @@ int main() {
 
     map<string, map<string, vector<vector<float> > > > groupedCR;
     for( int i = 0; i < queryNames.size(); i++) {
-        vector<float> tmp = {extensionSides[i], ES2[i], OH1[i], OH2[i], EL1[i], EL2[i]};
+        vector<float> tmp = {extensionSides[i], ES2[i], OH1[i], OH2[i], EL1[i], EL2[i], OL2[i]};
         groupedCR[targetNames[i]][queryNames[i]].push_back(tmp);
     }
     vector<string> keysCR;
@@ -139,7 +139,7 @@ int main() {
 
     map<float, vector<vector<tuple<string, int> > > > paths;
     int maxDepth = 30;
-    int nTimes = 2;
+    int nTimes = 1;
     paths = monteCarloWrapper(keysCR, groupedCR, keysRR, groupedRR, maxDepth, nTimes);
     // string read;
     // int number;
@@ -156,6 +156,16 @@ int main() {
 
     map<tuple<string, string>, vector<vector<tuple<string, int> > > >  pathsMap;
     pathsMap = mapPaths(0.0, paths);
+
+    map<tuple<string, string>, vector<tuple<vector<tuple<string, int> >, float> > > pathLengthsMap;
+    pathLengthsMap = calculatePathLengths(pathsMap, groupedCR, groupedRR);
+
+    // for( auto key : pathLengthsMap) {
+    //     for( auto tapl : key.second) {
+    //         float length = get<1>(tapl);
+    //         cout << get<0>(key.first) << "->" << get<1>(key.first) << ":" << (int) length << endl;
+    //     }
+    // }
 
     // string read;
     // int number;
