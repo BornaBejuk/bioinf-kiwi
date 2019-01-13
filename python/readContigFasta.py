@@ -43,35 +43,37 @@ def readFastq(filename, list_of_names):
     file.close()
     return names, reads
 
-def createReadingLists1(reads_filename, contigs_filename):
+def createReadingLists1(reads_filename, contigs_filename, list_of_names ):
     names, reads = [],[]
-    n, r = readFasta(contigs_filename)
+    n, r = readFasta(contigs_filename, list_of_names)
     names += n
     reads += r
 
-    n, r = readFastq(reads_filename)
+    n, r = readFastq(reads_filename, list_of_names)
     names += n
     reads += r
     return names, reads
 
-def createReadingLists(reads_filename, contigs_filename):
+def createReadingLists(reads_filename, contigs_filename, list_of_names):
     names, reads = [],[]
-    n, r = readFasta(contigs_filename)
+    n, r = readFasta(contigs_filename, list_of_names)
     names += n
     reads += r
 
-    n, r = readFasta(reads_filename)
+    n, r = readFasta(reads_filename, list_of_names)
     names += n
     reads += r
     return names, reads
 
 
-def createFastaReference(connections, names, reads):
+def createFastaReference(connections, reads_filename, contigs_filename):
 
     results = find_connections(connections) #connections je bejukov ulaz tipa ['ctg1', 'read00001', 'read00007', 'read00002', 'ctg2']
     #print(results)
+    names, reads = createReadingLists(reads_filename, contigs_filename, results)
     result_names = results # e sad njih treba postpajati. ali kako.
     result_reads = []
+
     #print(result_names)
     for i in result_names:
         result_reads.append(reads[names.index(i)]) ## e sad, njih treba spojiti, prema onim fjama iz utils-a.
@@ -84,8 +86,7 @@ def createFastaReference(connections, names, reads):
     file.close()
 
 def create_solution(reads_filename, contigs_filename, read_pairs):
-    names, reads = createReadingLists(reads_filename, contigs_filename)
-    createFastaReference(read_pairs, names, reads)
+    createFastaReference(read_pairs, reads_filename, contigs_filename)
     return
 
 
