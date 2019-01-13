@@ -9,11 +9,12 @@
 
 using namespace std;
 
-vector<tuple<string, int> > monteCarlo(string start, float side, vector<string> keysCR, map<string, map<string, vector<vector<float> > > > groupedCR,
+vector<vector<tuple<string, int> > > monteCarlo(string start, float side, vector<string> keysCR, map<string, map<string, vector<vector<float> > > > groupedCR,
                         vector<string> keysRR, map<string, map<string, vector<vector<float> > > > groupedRR, int maxDepth){
 
-    vector<tuple<string, int> > allPaths;
+    vector<vector<tuple<string, int> > > allPaths;
     int nTimes = 1000;
+    int nGoals = 0;
     for( int i = 0; i < nTimes; i++){
         cout << "i:" << i << endl;
         vector<tuple<string, int> > paths = depthFirstSearch(start, side, keysCR, groupedCR, keysRR, groupedRR, maxDepth);
@@ -26,6 +27,16 @@ vector<tuple<string, int> > monteCarlo(string start, float side, vector<string> 
                 // do stuff ...
             // }
         // }
+        if( paths.size() > 1){
+            nGoals += 1;
+        }
+        cout << "nGoals: " << nGoals << endl;
+        string read;
+        int number;
+        for( auto element : paths) {
+            tie(read, number) = element;
+            cout << read << " " << number << '\n';
+        }
     }
 
     return allPaths;
@@ -59,8 +70,8 @@ vector<tuple<string, int> > depthFirstSearch(string start, float side, vector<st
                 return path;
             }
             else {
-                tie(read, number) = getMCReadForRead(currentTarget, side, groupedCR, groupedRR);
-                if( number == -1) {
+                tie(read, number) = getMCReadForRead(currentTarget, side, start, groupedCR, groupedRR);
+                if( number == -2) {
                     break;
                 }
                 // cout << "Nasel sam:" << currentTarget << ' ' << read << number << endl;
@@ -79,10 +90,12 @@ tuple<string, int> getMCReadForContig(string contig, float side, map<string, map
 
     for( auto query : groupedCR[contig]){
         for( int i = 0; i < query.second.size(); i++) {
+            // cout << i << endl;
             // pick ES
             if( side == query.second[i][0]){
                 if( query.second[i][1] > 0) {
                     sum += query.second[i][1];
+                    // break;
                 }
             }
         }
@@ -111,10 +124,13 @@ tuple<string, int> getMCReadForContig(string contig, float side, map<string, map
     return make_tuple("", -1);
 }
 
-tuple<string, int> getMCReadForRead(string read, float side, map<string, map<string, vector<vector<float> > > > groupedCR, map<string, map<string, vector<vector<float> > > > groupedRR) {
+tuple<string, int> getMCReadForRead(string read, float side, string startContig, map<string, map<string, vector<vector<float> > > > groupedCR, map<string, map<string, vector<vector<float> > > > groupedRR) {
 
     // try to find contig == goal
     for( auto target : groupedCR) {
+        if( target.first == startContig) {
+            continue;
+        }
         for( auto query : target.second){
             if( query.first != read) {
                 continue;
@@ -131,6 +147,19 @@ tuple<string, int> getMCReadForRead(string read, float side, map<string, map<str
 
 
     float sum = 0.0;
+
+    for( auto query : groupedRR[read]){
+        for( int i = 0; i < query.second.size(); i++) {
+            // pick ES
+            if( side == query.second[i][0]){
+                if( query.second[i][1] > 0) {
+                    sum += query.second[i][1];
+                    // break;
+                }
+            }
+        }
+    }
+
     float offset = 0.0;
     random_device rand_dev;
     mt19937 generator(rand_dev());
@@ -153,5 +182,5 @@ tuple<string, int> getMCReadForRead(string read, float side, map<string, map<str
         }
     }
 
-    return make_tuple("", -1);
+    return make_tuple("", -2);
 }
