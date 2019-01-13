@@ -9,15 +9,42 @@
 
 using namespace std;
 
-vector<vector<tuple<string, int> > > monteCarlo(string start, float side, vector<string> keysCR, map<string, map<string, vector<vector<float> > > > groupedCR,
-                        vector<string> keysRR, map<string, map<string, vector<vector<float> > > > groupedRR, int maxDepth){
+map<float, vector<vector<tuple<string, int> > > > monteCarloWrapper(vector<string> keysCR, map<string, map<string, vector<vector<float> > > > groupedCR, vector<string> keysRR,
+                                                                    map<string, map<string, vector<vector<float> > > > groupedRR, int maxDepth, int nTimes) {
 
+    map<float, vector<vector<tuple<string, int> > > > allPathsMap;
     vector<vector<tuple<string, int> > > allPaths;
-    int nTimes = 1000;
+
+    float extensionSide = 0.0;
+
+    for( auto key : keysCR) {
+        paths = monteCarlo(key, extensionSide, keysCR, groupedCR, keysRR, groupedRR, maxDepth);
+        for( auto path : paths) {
+            allPathsMap[extensionSide].push_back(path);
+        }
+    }
+
+    extensionSide = 1.0
+    for( auto key : keysCR) {
+        paths = monteCarlo(key, extensionSide, keysCR, groupedCR, keysRR, groupedRR, maxDepth);
+        for( auto path : paths) {
+            allPathsMap[extensionSide].push_back(path);
+        }
+    }
+
+    return allPathsMap;
+}
+
+vector<vector<tuple<string, int> > > monteCarlo(string start, float side, vector<string> keysCR, map<string, map<string, vector<vector<float> > > > groupedCR,
+                        vector<string> keysRR, map<string, map<string, vector<vector<float> > > > groupedRR, int maxDepth, int nTimes){
+
+    vector<vector<tuple<string, int> > > paths;
+    vector<tuple<string, int> > path;
+    // int nTimes = 1000;
     int nGoals = 0;
     for( int i = 0; i < nTimes; i++){
         cout << "i:" << i << endl;
-        vector<tuple<string, int> > paths = depthFirstSearch(start, side, keysCR, groupedCR, keysRR, groupedRR, maxDepth);
+        path = mcSearch(start, side, keysCR, groupedCR, keysRR, groupedRR, maxDepth);
         // vector<tuple<string, int> >::iterator row;
         // vector<string>::iterator col;
         // for (row = paths.begin(); row != paths.end(); row++) {
@@ -29,21 +56,22 @@ vector<vector<tuple<string, int> > > monteCarlo(string start, float side, vector
         // }
         if( paths.size() > 1){
             nGoals += 1;
+            paths.push_back(path);
         }
         cout << "nGoals: " << nGoals << endl;
         string read;
         int number;
-        for( auto element : paths) {
+        for( auto element : path) {
             tie(read, number) = element;
             cout << read << " " << number << '\n';
         }
     }
 
-    return allPaths;
+    return paths;
 }
 
 
-vector<tuple<string, int> > depthFirstSearch(string start, float side, vector<string> keysCR, map<string, map<string, vector<vector<float> > > > groupedCR,
+vector<tuple<string, int> > mcSearch(string start, float side, vector<string> keysCR, map<string, map<string, vector<vector<float> > > > groupedCR,
                         vector<string> keysRR, map<string, map<string, vector<vector<float> > > > groupedRR, int maxDepth) {
 
     vector<tuple<string, int> > path;

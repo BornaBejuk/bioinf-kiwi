@@ -3,10 +3,13 @@
 
 using namespace std;
 
-vector<vector<tuple<string, int> > > monteCarlo(string start, float side, vector<string> keysCR, map<string, map<string, vector<vector<float> > > > groupedCR,
-                        vector<string> keysRR, map<string, map<string, vector<vector<float> > > > groupedRR, int maxDepth);
+map<float, vector<vector<tuple<string, int> > > > monteCarloWrapper(vector<string> keysCR, map<string, map<string, vector<vector<float> > > > groupedCR, vector<string> keysRR,
+                                                                    map<string, map<string, vector<vector<float> > > > groupedRR, int maxDepth, int nTimes);
 
-vector<tuple<string, int> > depthFirstSearch(string start, float side, vector<string> keysCR, map<string, map<string, vector<vector<float> > > > groupedCR,
+vector<vector<tuple<string, int> > > monteCarlo(string start, float side, vector<string> keysCR, map<string, map<string, vector<vector<float> > > > groupedCR,
+                        vector<string> keysRR, map<string, map<string, vector<vector<float> > > > groupedRR, int maxDepth, int nTimes);
+
+vector<tuple<string, int> > mcSearch(string start, float side, vector<string> keysCR, map<string, map<string, vector<vector<float> > > > groupedCR,
                         vector<string> keysRR, map<string, map<string, vector<vector<float> > > > groupedRR, int maxDepth);
 
 tuple<string, int> getMCReadForContig(string contig, float side, map<string, map<string, vector<vector<float> > > > groupedCR);

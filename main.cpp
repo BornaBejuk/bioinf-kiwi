@@ -136,9 +136,12 @@ int main() {
     // //     cout << x.first << ' '  << x.second << ' ' << '\n';
     // }
 
-    vector<tuple<string, int> > allPaths;
+    map<float, vector<vector<tuple<string, int> > > > paths;
     int maxDepth = 30;
-    allPaths = monteCarlo(keysCR[1], 0, keysCR, groupedCR, keysRR, groupedRR, maxDepth);
+    int nTimes = 100;
+    paths = monteCarlo(keysCR, groupedCR, keysRR, groupedRR, maxDepth, nTimes);
+
+    // allPaths = monteCarlo(keysCR[2], 0, keysCR, groupedCR, keysRR, groupedRR, maxDepth);
     // cout << proba[targetNames[0]][queryNames[0]][0] << '\n';
     // cout << queryLens[0] << '\n';
     // cout << targetLens[0] << '\n';
