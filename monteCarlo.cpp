@@ -42,8 +42,9 @@ vector<vector<tuple<string, int> > > monteCarlo(string start, float side, vector
     vector<tuple<string, int> > path;
     // int nTimes = 1000;
     int nGoals = 0;
+    int flag = 0;
     for( int i = 0; i < nTimes; i++){
-        cout << "Trial:" << i << endl;
+        flag = 0;
         path = mcSearch(start, side, keysCR, groupedCR, keysRR, groupedRR, maxDepth);
         // vector<tuple<string, int> >::iterator row;
         // vector<string>::iterator col;
@@ -54,13 +55,30 @@ vector<vector<tuple<string, int> > > monteCarlo(string start, float side, vector
                 // do stuff ...
             // }
         // }
-        if( path.size() > 1){
+        for( auto p1 : paths) {
+            if( equal(p1.begin(), p1.end(), path.begin()) != 0) {
+                flag = 1;
+                cout << "-----------------------------------------------" << endl;
+                cout << "Found path:" << endl;
+                string read;
+                int number;
+                for( auto element : path) {
+                    tie(read, number) = element;
+                    cout << read << " " << number << '\n';
+                }
+                cout << "Old path:" << endl;
+                for( auto element : p1) {
+                    tie(read, number) = element;
+                    cout << read << " " << number << '\n';
+                }
+                break;
+            }
+        }
+        if( path.size() > 1 && flag == 0){
             nGoals += 1;
             paths.push_back(path);
         }
-        cout << "nGoals: " << nGoals << endl;
-        // string read;
-        // int number;
+        cout << "Trial:" << i << " " << "Paths found:" << nGoals << endl;
         // for( auto element : path) {
             // tie(read, number) = element;
             // cout << read << " " << number << '\n';

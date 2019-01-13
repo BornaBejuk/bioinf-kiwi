@@ -33,3 +33,5 @@ void calculateEL(vector<float> &EL1, vector<float> &EL2, vector<int> &queryLens,
 void calculateOS(vector<float> &OS, vector<float> &OL1, vector<float> &OL2, vector<float> &SI);
 
 void calculateES(vector<float> &ES1, vector<float> &ES2, vector<float> &OS, vector<float> &EL1, vector<float> &EL2, vector<float> &OH1, vector<float> &OH2);
+
+map<string, string> loadFasta(string path);

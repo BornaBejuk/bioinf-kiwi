@@ -2,6 +2,7 @@
 #include <fstream>
 #include <vector>
 #include <sstream>
+#include <map>
 
 using namespace std;
 
@@ -15,7 +16,7 @@ void loadData(string path, vector<string> &queryNames, vector<int> &queryLens, v
     ifstream inputFile(path);
 
     if (inputFile.good()) {
-        int current_number = 0;
+        // int current_number = 0;
         while (getline(inputFile, line)) {
             stringstream linestream(line);
             string qName;
@@ -126,6 +127,7 @@ void filterBySI(float SImin, vector<string> &queryNames, vector<int> &queryLens,
 void calculateOL(vector<float> &OL1, vector<float> &OL2, vector<float> &queryStarts, vector<float> &queryEnds, vector<float> &targetStarts, vector<float> &targetEnds) {
 
     for( int i = 0; i < queryStarts.size(); i++) {
+        // TODO add - 1 to each because both are included, end and start
         OL1.push_back(queryEnds[i] - queryStarts[i]);
         OL2.push_back(targetEnds[i] - targetStarts[i]);
     }
@@ -177,4 +179,24 @@ void calculateES(vector<float> &ES1, vector<float> &ES2, vector<float> &OS, vect
 void calculateScores(vector<float> &OS, vector<float> &ES, vector<float> &SI, vector<float> &EL,
                     vector<float> &OH, vector<float> &resMatches, vector<float> &blockLens) {
 
+}
+
+map<string, string> loadFasta(string path) {
+
+    map<string, string> fasta;
+    string line;
+    ifstream inputFile(path);
+    string name;
+    if (inputFile.good()) {
+        while (getline(inputFile, line)) {
+            if( line.at(0) == '>' or line.at(0) == '@') {
+                stringstream linestream(line);
+                getline(linestream, name);
+                name = name.substr(1,name.size());
+            } else if( line.at(0) == 'A' or line.at(0) == 'C' or line.at(0) == 'T' or line.at(0) == 'G'){
+                fasta[name] = line;
+            }
+        }
+    }
+    return fasta;
 }

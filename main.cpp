@@ -14,6 +14,8 @@ int main() {
 
     string pathCR = "data/EColi-synthetic/overlaps-c-r.paf";
     string pathRR = "data/EColi-synthetic/overlaps-r-r.paf";
+    string pathFastaCtgs = "data/EColi-synthetic/ecoli_test_contigs.fasta";
+    string pathFastaReads = "data/EColi-synthetic/ecoli_test_reads.fasta";
 
     vector<string> queryNames;
     vector<int> queryLens;
@@ -139,7 +141,7 @@ int main() {
 
     map<float, vector<vector<tuple<string, int> > > > paths;
     int maxDepth = 30;
-    int nTimes = 1;
+    int nTimes = 5;
     paths = monteCarloWrapper(keysCR, groupedCR, keysRR, groupedRR, maxDepth, nTimes);
     // string read;
     // int number;
@@ -155,10 +157,10 @@ int main() {
     // }
 
     map<tuple<string, string>, vector<vector<tuple<string, int> > > >  pathsMap;
-    pathsMap = mapPaths(0.0, paths);
+    // pathsMap = mapPaths(0.0, paths);
 
     map<tuple<string, string>, vector<tuple<vector<tuple<string, int> >, float> > > pathLengthsMap;
-    pathLengthsMap = calculatePathLengths(pathsMap, groupedCR, groupedRR);
+    // pathLengthsMap = calculatePathLengths(pathsMap, groupedCR, groupedRR);
 
     // for( auto key : pathLengthsMap) {
     //     for( auto tapl : key.second) {
@@ -179,6 +181,10 @@ int main() {
     //         cout << endl;
     //     }
     // }
+
+
+    map<string, string> fastaReads;
+    // fastaReads = loadFasta(pathFastaReads);
 
     // allPaths = monteCarlo(keysCR[2], 0, keysCR, groupedCR, keysRR, groupedRR, maxDepth);
     // cout << proba[targetNames[0]][queryNames[0]][0] << '\n';
