@@ -138,8 +138,21 @@ int main() {
 
     map<float, vector<vector<tuple<string, int> > > > paths;
     int maxDepth = 30;
-    int nTimes = 100;
-    paths = monteCarlo(keysCR, groupedCR, keysRR, groupedRR, maxDepth, nTimes);
+    int nTimes = 2;
+    paths = monteCarloWrapper(keysCR, groupedCR, keysRR, groupedRR, maxDepth, nTimes);
+    // string read;
+    // int number;
+    // for( auto side : paths){
+    //     cout << side.first << " contains:" << endl;
+    //     for( auto p : side.second){
+    //         for( auto element : p) {
+    //             tie(read, number) = element;
+    //             cout << read << " " << number << '\n';
+    //         }
+    //         cout << endl;
+    //     }
+    // }
+
 
     // allPaths = monteCarlo(keysCR[2], 0, keysCR, groupedCR, keysRR, groupedRR, maxDepth);
     // cout << proba[targetNames[0]][queryNames[0]][0] << '\n';

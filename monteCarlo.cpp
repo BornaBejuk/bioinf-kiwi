@@ -12,27 +12,27 @@ using namespace std;
 map<float, vector<vector<tuple<string, int> > > > monteCarloWrapper(vector<string> keysCR, map<string, map<string, vector<vector<float> > > > groupedCR, vector<string> keysRR,
                                                                     map<string, map<string, vector<vector<float> > > > groupedRR, int maxDepth, int nTimes) {
 
-    map<float, vector<vector<tuple<string, int> > > > allPathsMap;
-    vector<vector<tuple<string, int> > > allPaths;
+    map<float, vector<vector<tuple<string, int> > > > pathsMap;
+    vector<vector<tuple<string, int> > > paths;
 
     float extensionSide = 0.0;
 
     for( auto key : keysCR) {
-        paths = monteCarlo(key, extensionSide, keysCR, groupedCR, keysRR, groupedRR, maxDepth);
+        paths = monteCarlo(key, extensionSide, keysCR, groupedCR, keysRR, groupedRR, maxDepth, nTimes);
         for( auto path : paths) {
-            allPathsMap[extensionSide].push_back(path);
+            pathsMap[extensionSide].push_back(path);
         }
     }
 
-    extensionSide = 1.0
+    extensionSide = 1.0;
     for( auto key : keysCR) {
-        paths = monteCarlo(key, extensionSide, keysCR, groupedCR, keysRR, groupedRR, maxDepth);
+        paths = monteCarlo(key, extensionSide, keysCR, groupedCR, keysRR, groupedRR, maxDepth, nTimes);
         for( auto path : paths) {
-            allPathsMap[extensionSide].push_back(path);
+            pathsMap[extensionSide].push_back(path);
         }
     }
 
-    return allPathsMap;
+    return pathsMap;
 }
 
 vector<vector<tuple<string, int> > > monteCarlo(string start, float side, vector<string> keysCR, map<string, map<string, vector<vector<float> > > > groupedCR,
@@ -43,7 +43,7 @@ vector<vector<tuple<string, int> > > monteCarlo(string start, float side, vector
     // int nTimes = 1000;
     int nGoals = 0;
     for( int i = 0; i < nTimes; i++){
-        cout << "i:" << i << endl;
+        cout << "Trial:" << i << endl;
         path = mcSearch(start, side, keysCR, groupedCR, keysRR, groupedRR, maxDepth);
         // vector<tuple<string, int> >::iterator row;
         // vector<string>::iterator col;
@@ -54,17 +54,17 @@ vector<vector<tuple<string, int> > > monteCarlo(string start, float side, vector
                 // do stuff ...
             // }
         // }
-        if( paths.size() > 1){
+        if( path.size() > 1){
             nGoals += 1;
             paths.push_back(path);
         }
         cout << "nGoals: " << nGoals << endl;
-        string read;
-        int number;
-        for( auto element : path) {
-            tie(read, number) = element;
-            cout << read << " " << number << '\n';
-        }
+        // string read;
+        // int number;
+        // for( auto element : path) {
+            // tie(read, number) = element;
+            // cout << read << " " << number << '\n';
+        // }
     }
 
     return paths;
@@ -93,8 +93,7 @@ vector<tuple<string, int> > mcSearch(string start, float side, vector<string> ke
         // cout << path.size() << endl;
         if( path.size() <= maxDepth) {
             if ( std::find(keysCR.begin(), keysCR.end(), currentTarget) != keysCR.end() ) {
-                path.push_back(make_tuple(currentTarget, -1));
-                cout << currentTarget << endl;
+                // path.push_back(make_tuple(currentTarget, -1));
                 return path;
             }
             else {
@@ -166,7 +165,7 @@ tuple<string, int> getMCReadForRead(string read, float side, string startContig,
             for( int i = 0; i < query.second.size(); i++) {
                 // if extends from other side
                 if( side != query.second[i][0]){
-                    cout << "GOAL FOUND!" << target.first << endl;
+                    // cout << "GOAL FOUND!" << target.first << endl;
                     return make_tuple(target.first, -1);
                 }
             }
