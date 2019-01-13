@@ -22,7 +22,7 @@ map<tuple<string, string>, vector<vector<tuple<string, int> > > > mapPaths(float
         path.erase(path.begin());
         path.pop_back();
         key = make_tuple(start, end);
-        cout << get<0>(path[0]) << endl;
+        // cout << get<0>(path[0]) << endl;
         pathsMap[key].push_back(path);
     }
 
@@ -33,7 +33,7 @@ map<tuple<string, string>, vector<vector<tuple<string, int> > > > mapPaths(float
 map<tuple<string, string>, vector<tuple<vector<tuple<string, int> >, float> > > calculatePathLengths(map<tuple<string, string>, vector<vector<tuple<string, int> > > > pathsMap, map<string, map<string, vector<vector<float> > > > groupedCR, map<string, map<string, vector<vector<float> > > > groupedRR) {
 
     map<tuple<string, string>, vector<tuple<vector<tuple<string, int> >, float> > > pathLengthsMap;
-    cout << "calcpathlen " << endl;
+
     string begin;
     string end;
     float ctgBeginLen;

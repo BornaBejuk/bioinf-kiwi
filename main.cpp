@@ -7,6 +7,7 @@
 #include "utils.h"
 #include "monteCarlo.h"
 #include "selectPaths.h"
+#include "scaffolding.h"
 
 using namespace std;
 
@@ -141,7 +142,7 @@ int main() {
 
     map<float, vector<vector<tuple<string, int> > > > paths;
     int maxDepth = 30;
-    int nTimes = 5;
+    int nTimes = 2;
     paths = monteCarloWrapper(keysCR, groupedCR, keysRR, groupedRR, maxDepth, nTimes);
     // string read;
     // int number;
@@ -156,11 +157,16 @@ int main() {
     //     }
     // }
 
-    map<tuple<string, string>, vector<vector<tuple<string, int> > > >  pathsMap;
-    // pathsMap = mapPaths(0.0, paths);
 
+    // TODO concatenate them or change mapPaths to work with both paths
+    map<tuple<string, string>, vector<vector<tuple<string, int> > > >  pathsMapLeft;
+    map<tuple<string, string>, vector<vector<tuple<string, int> > > >  pathsMapRight;
+    pathsMapLeft = mapPaths(0.0, paths);
+    pathsMapRight = mapPaths(1.0, paths);
+
+    // paths are now in one map, regardless of extension side
     map<tuple<string, string>, vector<tuple<vector<tuple<string, int> >, float> > > pathLengthsMap;
-    // pathLengthsMap = calculatePathLengths(pathsMap, groupedCR, groupedRR);
+    pathLengthsMap = calculatePathLengths(pathsMapLeft, groupedCR, groupedRR);
 
     // for( auto key : pathLengthsMap) {
     //     for( auto tapl : key.second) {
@@ -169,19 +175,26 @@ int main() {
     //     }
     // }
 
-    // string read;
-    // int number;
-    // for( auto key : pathsMap){
-    //     cout << get<0>(key.first) << " " << get<1>(key.first) << " paths:" << endl;
-    //     for( auto p : key.second){
-    //         for( auto element : p) {
-    //             tie(read, number) = element;
-    //             cout << read << " " << number << '\n';
-    //         }
-    //         cout << endl;
-    //     }
-    // }
+    string read;
+    int number;
+    for( auto key : pathsMapLeft){
+        cout << get<0>(key.first) << " " << get<1>(key.first) << " paths:" << endl;
+        // for( auto p : key.second){
+        //     for( auto element : p) {
+        //         tie(read, number) = element;
+        //         cout << read << " " << number << '\n';
+        //     }
+        //     cout << endl;
+        // }
+    }
 
+
+    vector<tuple<string, string> > scaffoldContigs;
+    scaffoldContigs = getScaffoldContigs(keysCR.size(), pathsMapLeft);
+
+    for( auto tapl : scaffoldContigs) {
+        cout << get<0>(tapl) << " " << get<1>(tapl) << endl;
+    }
 
     map<string, string> fastaReads;
     // fastaReads = loadFasta(pathFastaReads);
