@@ -5,8 +5,9 @@
 #include <random>
 #include <algorithm>
 
-#include "scaffolding.h"
+#include "scaffolding.hpp"
 
+// author: Karlo Brajdic
 
 // returns one path, map[ctg1,ctg2] = [(read1,0),(read2,0)...]
 // returns tuples for path, e.g. [(ctg1,ctg2), (ctg2,ctg3)]
@@ -109,9 +110,9 @@ vector<tuple<string, string> > getScaffoldContigs(int ctgNumber, map<tuple<strin
         }
         lastCtg = currentCtg;
     }
-
+    cout << "Contigs " << contigs.size() << endl;
     vector<string> queries;
-    if( contigs.size() < ( maxNumber - minNumber + 1)) {
+    if( contigs.size() < ( maxNumber - minNumber)) {
         for( auto key : pathsMap) {
             // check if key is already in path count
             if( std::find(contigs.begin(), contigs.end(), make_tuple(get<1>(key.first), get<0>(key.first))) != contigs.end() || std::find(queries.begin(), queries.end(), get<1>(key.first)) != queries.end()){

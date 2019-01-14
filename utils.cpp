@@ -6,6 +6,8 @@
 
 using namespace std;
 
+// author: Karlo Brajidc
+
 // loads overlap data files
 void loadData(string path, vector<string> &queryNames, vector<int> &queryLens, vector<float> &queryStarts,
             vector<float> &queryEnds, vector<string> &targetNames, vector<int> &targetLens,

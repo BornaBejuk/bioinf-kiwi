@@ -4,27 +4,29 @@
 #include <sstream>
 #include <map>
 
-#include "utils.h"
-#include "monteCarlo.h"
-#include "selectPaths.h"
-#include "scaffolding.h"
-#include "buildFasta.h"
+#include "utils.hpp"
+#include "monteCarlo.hpp"
+#include "selectPaths.hpp"
+#include "scaffolding.hpp"
+#include "buildFasta.hpp"
 
 using namespace std;
 
+// authors: Karlo Brajdic
+
 int main() {
 
-    // string pathCR = "data/EColi-synthetic/overlaps-c-r.paf";
-    // string pathRR = "data/EColi-synthetic/overlaps-r-r.paf";
-    // string pathFastaCtgs = "data/EColi-synthetic/ecoli_test_contigs.fasta";
-    // string pathFastaReads = "data/EColi-synthetic/ecoli_test_reads.fasta";
-    // string pathFastaOut = "data/EColi-synthetic/final.fasta";
+    string pathCR = "data/EColi-synthetic/overlaps-c-r.paf";
+    string pathRR = "data/EColi-synthetic/overlaps-r-r.paf";
+    string pathFastaCtgs = "data/EColi-synthetic/ecoli_test_contigs.fasta";
+    string pathFastaReads = "data/EColi-synthetic/ecoli_test_reads.fasta";
+    string pathFastaOut = "data/EColi-synthetic/final.fasta";
 
-    string pathCR = "data/CJejuni-real/overlaps-c-r.paf";
-    string pathRR = "data/CJejuni-real/overlaps-r-r.paf";
-    string pathFastaCtgs = "data/CJejuni-real/CJejuni-contigs.fasta";
-    string pathFastaReads = "data/CJejuni-real/CJejuni-reads.fastq";
-    string pathFastaOut = "data/CJejuni-real/final.fasta";
+    // string pathCR = "data/CJejuni-real/overlaps-c-r.paf";
+    // string pathRR = "data/CJejuni-real/overlaps-r-r.paf";
+    // string pathFastaCtgs = "data/CJejuni-real/CJejuni-contigs.fasta";
+    // string pathFastaReads = "data/CJejuni-real/CJejuni-reads.fastq";
+    // string pathFastaOut = "data/CJejuni-real/final.fasta";
 
     // string pathCR = "data/BGrahamii-real/overlaps-c-r.paf";
     // string pathRR = "data/BGrahamii-real/overlaps-r-r.paf";
@@ -165,7 +167,7 @@ int main() {
 
     map<float, vector<vector<tuple<string, int> > > > paths;
     int maxDepth = 50;
-    int nTimes = 30;
+    int nTimes = 2;
     // keysCR.clear();
     // keysCR.push_back("ctg1");
     // monteCarlo("ctg2", 0.0, keysCR, groupedCR, keysRR, groupedRR, maxDepth, nTimes);
@@ -192,8 +194,8 @@ int main() {
     // pathsMapRight = mapPaths(1.0, paths);
 
     // paths are now in one map, regardless of extension side
-    // map<tuple<string, string>, vector<tuple<vector<tuple<string, int> >, float> > > pathLengthsMap;
-    // pathLengthsMap = calculatePathLengths(pathsMapLeft, groupedCR, groupedRR);
+    map<tuple<string, string>, vector<tuple<vector<tuple<string, int> >, float> > > pathLengthsMap;
+    pathLengthsMap = calculatePathLengths(pathsMapLeft, groupedCR, groupedRR);
 
     // for( auto key : pathLengthsMap) {
     //     for( auto tapl : key.second) {
@@ -233,9 +235,10 @@ int main() {
     scaffoldContigs = getScaffoldContigs(keysCR.size(), pathsMapLeft);
 
     map<tuple<string, string>, vector<tuple<string, int> > > chosenPaths;
-    for( auto key : scaffoldContigs) {
-        chosenPaths[key] = pathsMapLeft[key][0];
-    }
+    chosenPaths = mapConsensusPath(dividePathsIntoGroups(pathLengthsMap, 10));
+    // for( auto key : scaffoldContigs) {
+    //     chosenPaths[key] = pathsMapLeft[key][0];
+    // }
 
     // for( auto tapl : scaffoldContigs) {
     //     cout << "da" << get<0>(tapl) << " " << get<1>(tapl) << endl;

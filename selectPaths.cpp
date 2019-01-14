@@ -4,10 +4,11 @@
 #include <algorithm>
 #include <typeinfo>
 
-#include "selectPaths.h"
+#include "selectPaths.hpp"
 
 using namespace std;
 
+// author: Karlo Brajdic
 // maps paths according to side they were extended
 map<tuple<string, string>, vector<vector<tuple<string, int> > > > mapPaths(float extensionSide, map<float, vector<vector<tuple<string, int> > > > paths) {
 
@@ -31,6 +32,7 @@ map<tuple<string, string>, vector<vector<tuple<string, int> > > > mapPaths(float
     return pathsMap;
 }
 
+// author: Karlo Brajdic
 // calculates path length for all paths
 map<tuple<string, string>, vector<tuple<vector<tuple<string, int> >, float> > > calculatePathLengths(map<tuple<string, string>, vector<vector<tuple<string, int> > > > pathsMap, map<string, map<string, vector<vector<float> > > > groupedCR, map<string, map<string, vector<vector<float> > > > groupedRR) {
 
@@ -70,7 +72,7 @@ map<tuple<string, string>, vector<tuple<vector<tuple<string, int> >, float> > > 
                 currentQueryIndex = get<1>(path[i+1]);
 
                 // - OH2 + EL1
-                pathLen += groupedRR[currentTargetRead][currentQueryRead][currentQueryIndex][3] + groupedRR[currentTargetRead][currentQueryRead][currentQueryIndex][4];
+                pathLen += groupedRR[currentTargetRead][currentQueryRead][currentQueryIndex][4] - groupedRR[currentTargetRead][currentQueryRead][currentQueryIndex][3];
             }
             // cout << (int) pathLen << endl;
 
@@ -82,11 +84,10 @@ map<tuple<string, string>, vector<tuple<vector<tuple<string, int> >, float> > > 
     return pathLengthsMap;
 }
 
+map<tuple<string, string>, vector<vector<tuple<vector<tuple<string, int>>, float> > > > dividePathsIntoGroups(map<tuple<string, string>, vector<tuple<vector<tuple<string, int>>, float> > > pathLengthsMap, int smallestGroupNumber) {
 
-map<tuple<string, string>, vector<vector<tuple<vector<tuple<string, int>>, float>>>> dividePathsIntoGroups(map<tuple<string, string>, vector<tuple<vector<tuple<string, int>>, float>>> pathLengthsMap, int smallestGroupNumber) {
-    
     map<tuple<string, string>, vector<vector<tuple<vector<tuple<string, int>>, float>>>> mapOfGroups;
-   
+
     for (auto key : pathLengthsMap) {
         vector<float> lengthsOfPaths;
         for (auto path : key.second) {
@@ -96,7 +97,7 @@ map<tuple<string, string>, vector<vector<tuple<vector<tuple<string, int>>, float
         float lowest = lengthsOfPaths[0];
         float highest = lengthsOfPaths[lengthsOfPaths.size() - 1];
         vector<vector<tuple<vector<tuple<string, int>>, float>>> groups;
-        
+
         float groupWindow = (float) (highest - lowest) / lengthsOfPaths.size();
         if (key.second.size() < smallestGroupNumber) {
             vector<tuple<vector<tuple<string, int>>, float>> first_group;
@@ -122,13 +123,11 @@ map<tuple<string, string>, vector<vector<tuple<vector<tuple<string, int>>, float
     return mapOfGroups;
 }
 
-bool sortbysec(const tuple<vector<tuple<string, int> >, float>& a,  
-               const tuple<vector<tuple<string, int> >, float>& b) 
-{ 
-    return (get<1>(a) < get<1>(b)); 
-} 
+bool sortbysec(const tuple<vector<tuple<string, int> >, float>& a, const tuple<vector<tuple<string, int> >, float>& b) {
+    return (get<1>(a) < get<1>(b));
+}
 
-map<tuple<string,string>, vector<tuple<string, int>>> mapConsensusPath(map<tuple<string, string>, vector<vector<tuple<vector<tuple<string, int>>, float>>>> mapOfGroups) {
+map<tuple<string,string>, vector<tuple<string, int> > > mapConsensusPath(map<tuple<string, string>, vector<vector<tuple<vector<tuple<string, int>>, float> > > > mapOfGroups) {
 
     map<tuple<string,string>, vector<tuple<string, int>>> mapOfChosenPaths;
     for (auto key: mapOfGroups) {
@@ -138,7 +137,7 @@ map<tuple<string,string>, vector<tuple<string, int>>> mapConsensusPath(map<tuple
             vectorOfGroupSizes.push_back(group.size());
         }
         int max_index = distance(vectorOfGroupSizes.begin(), max_element(vectorOfGroupSizes.begin(), vectorOfGroupSizes.end()));
-        vector<tuple<vector<tuple<string, int> >, float>> paths = key.second[max_index];
+        vector<tuple<vector<tuple<string, int> >, float> > paths = key.second[max_index];
         int numOfPaths = paths.size();
         int index = (int) numOfPaths / 2;
         sort(paths.begin(), paths.end(), sortbysec);

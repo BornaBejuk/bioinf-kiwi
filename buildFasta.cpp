@@ -6,7 +6,7 @@
 #include <random>
 #include <algorithm>
 
-#include "monteCarlo.h"
+#include "monteCarlo.hpp"
 
 using namespace std;
 
@@ -70,6 +70,7 @@ string build_fasta_file(vector<tuple<string, int> > final_path,
 
 }
 
+// author: Karlo Brajdic
 // builds fasta string by given scaffold order
 string buildFastaString(vector<vector<tuple<string, int> > > finalOrder, map<string, map<string, vector<vector<float> > > > groupedCR,
                         map<string, map<string, vector<vector<float> > > > groupedRR, map<string, string> fastaReads, map<string, string> fastaContigs, vector<string> keysCR) {
@@ -211,6 +212,7 @@ string buildFastaString(vector<vector<tuple<string, int> > > finalOrder, map<str
     return fastaString;
 }
 
+// author: Karlo Brajdic
 // saves fasta string in file
 void saveFasta(string fasta, string path) {
       ofstream myfile;

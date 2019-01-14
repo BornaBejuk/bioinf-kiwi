@@ -5,9 +5,11 @@
 #include <random>
 #include <algorithm>
 
-#include "monteCarlo.h"
+#include "monteCarlo.hpp"
 
 using namespace std;
+
+// author: Karlo Brajdic
 
 // wrapper function which calls monte-carlo for every contig
 map<float, vector<vector<tuple<string, int> > > > monteCarloWrapper(vector<string> keysCR, map<string, map<string, vector<vector<float> > > > groupedCR, vector<string> keysRR,
