@@ -1,6 +1,6 @@
 # bioinf-kiwi
 
-Instalation and running:
+Installation and running:
 
 git clone
 
