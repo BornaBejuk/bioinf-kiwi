@@ -84,6 +84,9 @@ map<tuple<string, string>, vector<tuple<vector<tuple<string, int> >, float> > > 
     return pathLengthsMap;
 }
 
+
+// author: Borna Bejuk
+// divides paths into groups for each key in map pathLengthsMap
 map<tuple<string, string>, vector<vector<tuple<vector<tuple<string, int>>, float> > > > dividePathsIntoGroups(map<tuple<string, string>, vector<tuple<vector<tuple<string, int>>, float> > > pathLengthsMap, int smallestGroupNumber) {
 
     map<tuple<string, string>, vector<vector<tuple<vector<tuple<string, int>>, float>>>> mapOfGroups;
@@ -118,15 +121,21 @@ map<tuple<string, string>, vector<vector<tuple<vector<tuple<string, int>>, float
             int position = (int) (length / groupWindow);
             groups[position].push_back(path);
         }
-    mapOfGroups[key.first] = groups;
+        mapOfGroups[key.first] = groups;
     }
     return mapOfGroups;
 }
 
+
+// author: Borna Bejuk
+// compares two tuples
 bool sortbysec(const tuple<vector<tuple<string, int> >, float>& a, const tuple<vector<tuple<string, int> >, float>& b) {
     return (get<1>(a) < get<1>(b));
 }
 
+
+// author: Borna Bejuk
+// chooses the path for each pair of contigs
 map<tuple<string,string>, vector<tuple<string, int> > > mapConsensusPath(map<tuple<string, string>, vector<vector<tuple<vector<tuple<string, int>>, float> > > > mapOfGroups) {
 
     map<tuple<string,string>, vector<tuple<string, int>>> mapOfChosenPaths;

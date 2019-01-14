@@ -10,6 +10,8 @@
 
 using namespace std;
 
+
+// author: Borna Bejuk
 // builds fasta file, currently not in use
 string build_fasta_file(vector<tuple<string, int> > final_path,
                         map<string, map<string, vector<vector<float> > > > groupedCR,
