@@ -112,43 +112,41 @@ vector<tuple<string, string> > getScaffoldContigs(int ctgNumber, map<tuple<strin
 }
 
 
-vector<tuple<string, int> > buildFinalScaffoldOrder(map<tuple<string, string>, vector<tuple<string, int> > > chosenPaths, vector<tuple<string, string> > scaffoldContigs) {
+vector<vector<tuple<string, int> > > buildFinalScaffoldOrder(map<tuple<string, string>, vector<tuple<string, int> > > chosenPaths, vector<tuple<string, string> > scaffoldContigs) {
 
-    vector<tuple<string, int> > finalOrder;
+    vector<vector<tuple<string, int> > > finalOrder;
     vector<tuple<string, int> > tmp;
     tuple<string, int> last;
     string begin;
     string end;
     tuple<string, int> target;
     tuple<string, int> query;
-    int flag = 0;
+
     for( auto key : scaffoldContigs) {
         begin = get<0>(key);
         end = get<1>(key);
 
         target = make_tuple(begin,-1);
-        if( flag == 0) {
-            finalOrder.push_back(target);
-            flag = 1;
-        }
         for( auto element : chosenPaths[key]) {
-            // tmp.clear();
-            // query = element;
-            // tmp.push_back(target);
-            // tmp.push_back(query);
-            finalOrder.push_back(element);
-            // target = query;
+            tmp.clear();
+            query = element;
+            tmp.push_back(target);
+            tmp.push_back(query);
+            finalOrder.push_back(tmp);
+            target = query;
         }
-        // tmp.clear();
+        tmp.clear();
         target = make_tuple(end,-1);;
-        // query = chosenPaths[key].back();
-        // tmp.push_back(target);
-        // tmp.push_back(query);
-        finalOrder.push_back(target);
+        query = chosenPaths[key].back();
+        tmp.push_back(target);
+        tmp.push_back(query);
+        finalOrder.push_back(tmp);
     }
 
     for( auto vec : finalOrder) {
-            cout << "Element:" << get<0>(vec) << " " << get<1>(vec) << endl;
+        for( auto element : vec) {
+            cout << "Element:" << get<0>(element) << " " << get<1>(element) << endl;
+        }
     }
 
     return finalOrder;
