@@ -8,6 +8,7 @@
 #include "monteCarlo.h"
 #include "selectPaths.h"
 #include "scaffolding.h"
+#include "buildFasta.h"
 
 using namespace std;
 
@@ -218,7 +219,12 @@ int main() {
     finalOrder = buildFinalScaffoldOrder(chosenPaths);
 
     map<string, string> fastaReads;
-    // fastaReads = loadFasta(pathFastaReads);
+    fastaReads = loadFasta(pathFastaReads);
+
+    map<string, string> fastaContigs;
+    fastaContigs = loadFasta(pathFastaCtgs);
+
+
 
     // allPaths = monteCarlo(keysCR[2], 0, keysCR, groupedCR, keysRR, groupedRR, maxDepth);
     // cout << proba[targetNames[0]][queryNames[0]][0] << '\n';
