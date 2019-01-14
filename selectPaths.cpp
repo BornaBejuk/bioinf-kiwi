@@ -7,6 +7,7 @@
 
 using namespace std;
 
+// maps paths according to side they were extended
 map<tuple<string, string>, vector<vector<tuple<string, int> > > > mapPaths(float extensionSide, map<float, vector<vector<tuple<string, int> > > > paths) {
 
     map<tuple<string, string>, vector<vector<tuple<string, int> > > > pathsMap;
@@ -29,7 +30,7 @@ map<tuple<string, string>, vector<vector<tuple<string, int> > > > mapPaths(float
     return pathsMap;
 }
 
-// map[(ctg1,ctg2)] = [([(read1, 0), (read2, 0), (read3, 0)], 12345)]
+// calculates path length for all paths
 map<tuple<string, string>, vector<tuple<vector<tuple<string, int> >, float> > > calculatePathLengths(map<tuple<string, string>, vector<vector<tuple<string, int> > > > pathsMap, map<string, map<string, vector<vector<float> > > > groupedCR, map<string, map<string, vector<vector<float> > > > groupedRR) {
 
     map<tuple<string, string>, vector<tuple<vector<tuple<string, int> >, float> > > pathLengthsMap;

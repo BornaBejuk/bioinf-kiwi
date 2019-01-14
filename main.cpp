@@ -23,8 +23,22 @@ int main() {
     string pathCR = "data/CJejuni-real/overlaps-c-r.paf";
     string pathRR = "data/CJejuni-real/overlaps-r-r.paf";
     string pathFastaCtgs = "data/CJejuni-real/CJejuni-contigs.fasta";
-    string pathFastaReads = "data/CJejuni-real/CJejuni-contigs.fasta";
+    string pathFastaReads = "data/CJejuni-real/CJejuni-reads.fastq";
     string pathFastaOut = "data/CJejuni-real/final.fasta";
+
+    // string pathCR = "data/BGrahamii-real/overlaps-c-r.paf";
+    // string pathRR = "data/BGrahamii-real/overlaps-r-r.paf";
+    // string pathFastaCtgs = "ddata/BGrahamii-real/BGrahamii-contigs.fasta";
+    // string pathFastaReads = "data/BGrahamii-real/BGrahamii-reads.fastq";
+    // string pathFastaOut = "data/BGrahamii-real/final.fasta";
+
+    // map<string, string> fastaReads1;
+    // // fastaReads1 = loadFasta(pathFastaReads);
+    //
+    // map<string, string> fastaContigs1;
+    // fastaContigs1 = loadFasta(pathFastaCtgs);
+    // return 0;
+
 
     vector<string> queryNames;
     vector<int> queryLens;
@@ -41,7 +55,7 @@ int main() {
 
     vector<float> extensionSides; // 1 is right, 0 is left
     vector<float> SI;
-    float SImin = 0.7;
+    float SImin = 0.6;
     vector<float> OL1;
     vector<float> OL2;
     vector<float> OH1;
@@ -151,7 +165,7 @@ int main() {
 
     map<float, vector<vector<tuple<string, int> > > > paths;
     int maxDepth = 50;
-    int nTimes = 5;
+    int nTimes = 30;
     // keysCR.clear();
     // keysCR.push_back("ctg1");
     // monteCarlo("ctg2", 0.0, keysCR, groupedCR, keysRR, groupedRR, maxDepth, nTimes);
@@ -173,13 +187,13 @@ int main() {
 
     // TODO concatenate them or change mapPaths to work with both paths
     map<tuple<string, string>, vector<vector<tuple<string, int> > > >  pathsMapLeft;
-    map<tuple<string, string>, vector<vector<tuple<string, int> > > >  pathsMapRight;
+    // map<tuple<string, string>, vector<vector<tuple<string, int> > > >  pathsMapRight;
     pathsMapLeft = mapPaths(0.0, paths);
-    pathsMapRight = mapPaths(1.0, paths);
+    // pathsMapRight = mapPaths(1.0, paths);
 
     // paths are now in one map, regardless of extension side
-    map<tuple<string, string>, vector<tuple<vector<tuple<string, int> >, float> > > pathLengthsMap;
-    pathLengthsMap = calculatePathLengths(pathsMapLeft, groupedCR, groupedRR);
+    // map<tuple<string, string>, vector<tuple<vector<tuple<string, int> >, float> > > pathLengthsMap;
+    // pathLengthsMap = calculatePathLengths(pathsMapLeft, groupedCR, groupedRR);
 
     // for( auto key : pathLengthsMap) {
     //     for( auto tapl : key.second) {
@@ -190,8 +204,10 @@ int main() {
 
     // string read;
     // int number;
+    cout << "Paths left: " << endl;
+
     for( auto key : pathsMapLeft){
-        cout << get<0>(key.first) << " " << get<1>(key.first) << " paths:" << endl;
+        cout << get<0>(key.first) << " " << get<1>(key.first) << " paths:" << key.second.size() << endl;
         // for( auto p : key.second){
         //     for( auto element : p) {
         //         tie(read, number) = element;
@@ -200,6 +216,17 @@ int main() {
         //     cout << endl;
         // }
     }
+    // cout << "Paths right: " << endl;
+    // for( auto key : pathsMapRight){
+    //     cout << get<0>(key.first) << " " << get<1>(key.first) << " paths: " << key.second.size() << endl;
+    //     // for( auto p : key.second){
+    //     //     for( auto element : p) {
+    //     //         tie(read, number) = element;
+    //     //         cout << read << " " << number << '\n';
+    //     //     }
+    //     //     cout << endl;
+    //     // }
+    // }
 
 
     vector<tuple<string, string> > scaffoldContigs;
@@ -210,12 +237,12 @@ int main() {
         chosenPaths[key] = pathsMapLeft[key][0];
     }
 
-    for( auto tapl : scaffoldContigs) {
-        cout << "da" << get<0>(tapl) << " " << get<1>(tapl) << endl;
-    }
-    for( auto tapl : chosenPaths) {
-        cout << "ne" << get<0>(tapl.first) << " " << get<1>(tapl.first) << endl;
-    }
+    // for( auto tapl : scaffoldContigs) {
+    //     cout << "da" << get<0>(tapl) << " " << get<1>(tapl) << endl;
+    // }
+    // for( auto tapl : chosenPaths) {
+    //     cout << "ne" << get<0>(tapl.first) << " " << get<1>(tapl.first) << endl;
+    // }
 
     vector<vector<tuple<string, int> > > finalOrder;
     finalOrder = buildFinalScaffoldOrder(chosenPaths, scaffoldContigs);
@@ -225,7 +252,7 @@ int main() {
     string currentQuery;
     int currentTargetIndex;
     int currentQueryIndex;
-    cout << "---------------" << endl;
+    cout << "Scaffold order:" << endl;
     for( auto pair : finalOrder) {
         currentTarget = get<0>(pair[0]);
         currentTargetIndex = get<1>(pair[1]);
@@ -234,7 +261,7 @@ int main() {
 
         cout << currentTarget << " " << currentTargetIndex << " " << currentQuery << " " << currentQueryIndex << endl;
     }
-
+    cout << "Scaffold order end." << endl;
 
     map<string, string> fastaReads;
     fastaReads = loadFasta(pathFastaReads);
@@ -243,7 +270,7 @@ int main() {
     fastaContigs = loadFasta(pathFastaCtgs);
 
     string fastaString;
-    fastaString = buildFastaString(finalOrder, groupedCR, groupedRR, fastaReads, fastaContigs);
+    fastaString = buildFastaString(finalOrder, groupedCR, groupedRR, fastaReads, fastaContigs, keysCR);
 
     saveFasta(fastaString, pathFastaOut);
     // allPaths = monteCarlo(keysCR[2], 0, keysCR, groupedCR, keysRR, groupedRR, maxDepth);

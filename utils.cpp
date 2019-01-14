@@ -6,6 +6,7 @@
 
 using namespace std;
 
+// loads overlap data files
 void loadData(string path, vector<string> &queryNames, vector<int> &queryLens, vector<float> &queryStarts,
             vector<float> &queryEnds, vector<string> &targetNames, vector<int> &targetLens,
             vector<float> &targetStarts, vector<float> &targetEnds, vector<float> &resMatches,
@@ -14,7 +15,8 @@ void loadData(string path, vector<string> &queryNames, vector<int> &queryLens, v
     string line;
 
     ifstream inputFile(path);
-
+    float sisum = 0.0;
+    float counter = 0.0;
     if (inputFile.good()) {
         // int current_number = 0;
         while (getline(inputFile, line)) {
@@ -41,7 +43,9 @@ void loadData(string path, vector<string> &queryNames, vector<int> &queryLens, v
             }
 
             float si = resMatch / bLen;
-
+            sisum += si;
+            counter += 1;
+            // cout << si << endl;
             if( si > SImin) {
                 queryNames.push_back(qName);
                 queryLens.push_back(qLen);
@@ -57,16 +61,21 @@ void loadData(string path, vector<string> &queryNames, vector<int> &queryLens, v
             }
         }
     }
+
+    cout << "AVG SI: " << sisum / counter << endl;
 }
 
+// determines if target is extended to right
 bool extendRight(float queryEnd, int queryLen, float targetEnd, int targetLen) {
     return (targetLen - targetEnd - 1) < (queryLen - queryEnd - 1);
 }
 
+// determines if target is extended to left
 bool extendLeft(float queryStart, float targetStart) {
     return targetStart < queryStart;
 }
 
+// filters reads that are fully contained inside contig
 void filterContained(vector<string> &queryNames, vector<int> &queryLens, vector<float> &queryStarts,
             vector<float> &queryEnds, vector<string> &targetNames, vector<int> &targetLens,
             vector<float> &targetStarts, vector<float> &targetEnds, vector<float> &resMatches,
@@ -94,6 +103,7 @@ void filterContained(vector<string> &queryNames, vector<int> &queryLens, vector<
     }
 }
 
+// calculates sequence index
 void calculateSI(vector<float> &SI, vector<float> &resMatches, vector<float> &blockLens) {
 
     for( int i = 0; i < resMatches.size(); i++) {
@@ -101,6 +111,7 @@ void calculateSI(vector<float> &SI, vector<float> &resMatches, vector<float> &bl
     }
 }
 
+// filters by SImin, currently not in use
 void filterBySI(float SImin, vector<string> &queryNames, vector<int> &queryLens, vector<float> &queryStarts,
             vector<float> &queryEnds, vector<string> &targetNames, vector<int> &targetLens,
             vector<float> &targetStarts, vector<float> &targetEnds, vector<float> &resMatches,
@@ -128,6 +139,7 @@ void filterBySI(float SImin, vector<string> &queryNames, vector<int> &queryLens,
     }
 }
 
+// calculates overlap length
 void calculateOL(vector<float> &OL1, vector<float> &OL2, vector<float> &queryStarts, vector<float> &queryEnds, vector<float> &targetStarts, vector<float> &targetEnds) {
 
     for( int i = 0; i < queryStarts.size(); i++) {
@@ -137,6 +149,7 @@ void calculateOL(vector<float> &OL1, vector<float> &OL2, vector<float> &querySta
     }
 }
 
+// calculates overhang length
 void calculateOH(vector<float> &OH1, vector<float> &OH2, vector<int> &queryLens, vector<float> &queryStarts, vector<float> &queryEnds,
     vector<int> &targetLens, vector<float> &targetStarts, vector<float> &targetEnds, vector<float> &extensionSides) {
 
@@ -151,6 +164,7 @@ void calculateOH(vector<float> &OH1, vector<float> &OH2, vector<int> &queryLens,
     }
 }
 
+// calculates extension length
 void calculateEL(vector<float> &EL1, vector<float> &EL2, vector<int> &queryLens, vector<float> &queryStarts, vector<float> &queryEnds,
     vector<int> &targetLens, vector<float> &targetStarts, vector<float> &targetEnds, vector<float> &extensionSides) {
 
@@ -165,6 +179,7 @@ void calculateEL(vector<float> &EL1, vector<float> &EL2, vector<int> &queryLens,
     }
 }
 
+// calculates overlap score
 void calculateOS(vector<float> &OS, vector<float> &OL1, vector<float> &OL2, vector<float> &SI) {
 
     for( int i = 0; i < OL1.size(); i++) {
@@ -172,6 +187,7 @@ void calculateOS(vector<float> &OS, vector<float> &OL1, vector<float> &OL2, vect
     }
 }
 
+// calculates extension score
 void calculateES(vector<float> &ES1, vector<float> &ES2, vector<float> &OS, vector<float> &EL1, vector<float> &EL2, vector<float> &OH1, vector<float> &OH2) {
 
     for( int i = 0; i < EL1.size(); i++) {
@@ -180,11 +196,13 @@ void calculateES(vector<float> &ES1, vector<float> &ES2, vector<float> &OS, vect
     }
 }
 
+// calculates all scores
 void calculateScores(vector<float> &OS, vector<float> &ES, vector<float> &SI, vector<float> &EL,
                     vector<float> &OH, vector<float> &resMatches, vector<float> &blockLens) {
 
 }
 
+// loads fasta files
 map<string, string> loadFasta(string path) {
 
     map<string, string> fasta;
@@ -196,6 +214,9 @@ map<string, string> loadFasta(string path) {
             if( line.at(0) == '>' or line.at(0) == '@') {
                 stringstream linestream(line);
                 getline(linestream, name);
+                if( name[1] == 'C' or name[1] == 'c') {
+                    name = name.substr(0,5);
+                }
                 name = name.substr(1,name.size());
             } else if( line.at(0) == 'A' or line.at(0) == 'C' or line.at(0) == 'T' or line.at(0) == 'G'){
                 fasta[name] = line;

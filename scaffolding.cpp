@@ -54,6 +54,7 @@
 //     return contigs;
 // }
 
+// Determines which paths should be included in scaffold
 vector<tuple<string, string> > getScaffoldContigs(int ctgNumber, map<tuple<string, string>, vector<vector<tuple<string, int> > > > pathsMap) {
 
 
@@ -69,7 +70,7 @@ vector<tuple<string, string> > getScaffoldContigs(int ctgNumber, map<tuple<strin
     tuple<string, string> currentKey;
     for( auto key : pathsMap) {
         name = get<0>(key.first).substr(0,get<0>(key.first).size()-1);
-        cout << "contig name: " << name << endl;
+        // cout << "contig name: " << name << endl;
 
         // cout << "key1,2 in pathsmap: " << get<0>(key.first) << " " << get<1>(key.first) << endl;
 
@@ -88,30 +89,44 @@ vector<tuple<string, string> > getScaffoldContigs(int ctgNumber, map<tuple<strin
         if( number2 < minNumber ) {
             minNumber = number2;
         }
-        cout << "contig number: " << number << endl;
+        // cout << "contig number: " << number << endl;
         // break;
         tmp.push_back(key.first);
         // if( stoi(get<0>(key.first)) )
     }
 
-    cout << "Contig name" << name << "min,max number:" << minNumber << " " << maxNumber << endl;
+    // cout << "Contig name" << name << " min,max number: " << minNumber << " " << maxNumber << endl;
 
     string lastCtg = name + to_string(maxNumber);
     string currentCtg;
     for( int i = maxNumber - 1; i >= minNumber; i--) {
         currentCtg = name + to_string(i);
         currentKey = make_tuple(lastCtg,currentCtg);
-        cout << "Current key: " << get<0>(currentKey) << " " << get<1>(currentKey) << endl;
+        // cout << "Current key: " << get<0>(currentKey) << " " << get<1>(currentKey) << endl;
         if( std::find(tmp.begin(), tmp.end(), currentKey) != tmp.end()){
             contigs.push_back(currentKey);
             cout << "current key appended" << endl;
         }
         lastCtg = currentCtg;
     }
+
+    vector<string> queries;
+    if( contigs.size() < ( maxNumber - minNumber + 1)) {
+        for( auto key : pathsMap) {
+            // check if key is already in path count
+            if( std::find(contigs.begin(), contigs.end(), make_tuple(get<1>(key.first), get<0>(key.first))) != contigs.end() || std::find(queries.begin(), queries.end(), get<1>(key.first)) != queries.end()){
+                cout << "Same key or end so dont append it" << endl;
+                // pathCount[make_tuple(get<1>(key.first), get<0>(key.first))] += key.second.size();
+            } else {
+                queries.push_back(get<1>(key.first));
+                contigs.push_back(key.first);
+            }
+        }
+    }
     return contigs;
 }
 
-
+// builds pairs and orders scaffold so we can easily access maps by these keys in buidling scaffold
 vector<vector<tuple<string, int> > > buildFinalScaffoldOrder(map<tuple<string, string>, vector<tuple<string, int> > > chosenPaths, vector<tuple<string, string> > scaffoldContigs) {
 
     vector<vector<tuple<string, int> > > finalOrder;
@@ -143,11 +158,11 @@ vector<vector<tuple<string, int> > > buildFinalScaffoldOrder(map<tuple<string, s
         finalOrder.push_back(tmp);
     }
 
-    for( auto vec : finalOrder) {
-        for( auto element : vec) {
-            cout << "Element:" << get<0>(element) << " " << get<1>(element) << endl;
-        }
-    }
+    // for( auto vec : finalOrder) {
+    //     for( auto element : vec) {
+    //         cout << "Element:" << get<0>(element) << " " << get<1>(element) << endl;
+    //     }
+    // }
 
     return finalOrder;
 }

@@ -10,6 +10,7 @@
 
 using namespace std;
 
+// builds fasta file, currently not in use
 string build_fasta_file(vector<tuple<string, int> > final_path,
                         map<string, map<string, vector<vector<float> > > > groupedCR,
                         vector<string> keysCR,
@@ -69,8 +70,9 @@ string build_fasta_file(vector<tuple<string, int> > final_path,
 
 }
 
+// builds fasta string by given scaffold order
 string buildFastaString(vector<vector<tuple<string, int> > > finalOrder, map<string, map<string, vector<vector<float> > > > groupedCR,
-                        map<string, map<string, vector<vector<float> > > > groupedRR, map<string, string> fastaReads, map<string, string> fastaContigs) {
+                        map<string, map<string, vector<vector<float> > > > groupedRR, map<string, string> fastaReads, map<string, string> fastaContigs, vector<string> keysCR) {
 
     string fastaString;
     string currentTarget;
@@ -80,13 +82,16 @@ string buildFastaString(vector<vector<tuple<string, int> > > finalOrder, map<str
 
     int flagFirstEver = 1;
     int flagMiddle = 1;
+    string middle;
     int flagMiddleAfter = 0;
+
 
     int leftIndex;
     int rightIndex;
 
     string substringToInsert;
 
+    vector<string> contigsAppended;
 
     // string begin;
     // string end;
@@ -100,28 +105,32 @@ string buildFastaString(vector<vector<tuple<string, int> > > finalOrder, map<str
         currentTargetIndex = get<1>(pair[1]);
         currentQuery = get<0>(pair[1]);
         currentQueryIndex = get<1>(pair[1]);
-        // cout << begin << " " << end << endl;
-
+        // cout << "TARGET: " << currentTarget << " Query: " << currentQuery << endl;
 
         if ((currentTarget[0] == 'C' or currentTarget[0] == 'c') and (currentTarget[1] == 't') and (currentTarget[2] == 'g')) {
             if( flagFirstEver == 1 ){
+                contigsAppended.push_back(currentTarget);
                 flagFirstEver = 0;
 
                 leftIndex = groupedCR[currentTarget][currentQuery][currentQueryIndex][3]; // OH2
                 rightIndex = fastaContigs[currentTarget].size(); // end
 
+                // cout << "LEn  ctg " << fastaContigs[currentTarget].size() << endl;
                 substringToInsert = fastaContigs[currentTarget].substr(leftIndex, rightIndex);
                 fastaString = substringToInsert + fastaString;
 
                 leftIndex = 0;
                 rightIndex = groupedCR[currentTarget][currentQuery][currentQueryIndex][4]; // EL1
+                // cout << "LEn  read " << fastaReads[currentQuery].size() << endl;
 
                 substringToInsert = fastaReads[currentQuery].substr(leftIndex, rightIndex);
                 fastaString = substringToInsert + fastaString;
 
             } else if ( flagMiddle == 1) {
+                contigsAppended.push_back(currentTarget);
                 flagMiddle = 0;
                 flagMiddleAfter = 1;
+                middle = currentTarget;
 
                 leftIndex = 0;
                 rightIndex = groupedCR[currentTarget][currentQuery][currentQueryIndex][5]; // EL2
@@ -139,19 +148,34 @@ string buildFastaString(vector<vector<tuple<string, int> > > finalOrder, map<str
             } else if( flagMiddleAfter == 1) {
                 flagMiddleAfter = 0;
                 flagMiddle = 1;
+                if( currentTarget != middle ) {
+                    // in this case we dont have the same contig so we cant continue building but start again with new contig
+                    contigsAppended.push_back(currentTarget);
 
-                leftIndex = 0;
-                rightIndex = groupedCR[currentTarget][currentQuery][currentQueryIndex][3]; // OH2
+                    leftIndex = groupedCR[currentTarget][currentQuery][currentQueryIndex][3]; // OH2
+                    rightIndex = fastaContigs[currentTarget].size(); // end
 
-                // remove OH2
-                fastaString = fastaString.substr(rightIndex);
+                    substringToInsert = fastaContigs[currentTarget].substr(leftIndex, rightIndex);
+                    fastaString = substringToInsert + fastaString;
 
-                leftIndex = 0;
-                rightIndex = groupedCR[currentTarget][currentQuery][currentQueryIndex][4]; // EL1
+                    leftIndex = 0;
+                    rightIndex = groupedCR[currentTarget][currentQuery][currentQueryIndex][4]; // EL1
 
-                substringToInsert = fastaReads[currentQuery].substr(leftIndex, rightIndex);
-                fastaString = substringToInsert + fastaString;
+                    substringToInsert = fastaReads[currentQuery].substr(leftIndex, rightIndex);
+                    fastaString = substringToInsert + fastaString;
+                } else {
+                    leftIndex = 0;
+                    rightIndex = groupedCR[currentTarget][currentQuery][currentQueryIndex][3]; // OH2
 
+                    // remove OH2
+                    fastaString = fastaString.substr(rightIndex);
+
+                    leftIndex = 0;
+                    rightIndex = groupedCR[currentTarget][currentQuery][currentQueryIndex][4]; // EL1
+
+                    substringToInsert = fastaReads[currentQuery].substr(leftIndex, rightIndex);
+                    fastaString = substringToInsert + fastaString;
+                }
             }
         } else {
             // read read
@@ -171,10 +195,23 @@ string buildFastaString(vector<vector<tuple<string, int> > > finalOrder, map<str
 
         }
     }
+
+    // cout << "FIRst part over" << endl;
+
+    if( contigsAppended.size() < keysCR.size()) {
+        for( auto ctg : keysCR) {
+            if( !(std::find(contigsAppended.begin(), contigsAppended.end(), ctg) != contigsAppended.end())){
+                fastaString = fastaString + fastaContigs[ctg];
+                cout << "This contig is not already appended: " << ctg << endl;
+            }
+        }
+    }
+
     fastaString = ">final_path\n" + fastaString;
     return fastaString;
 }
 
+// saves fasta string in file
 void saveFasta(string fasta, string path) {
       ofstream myfile;
       myfile.open (path);
