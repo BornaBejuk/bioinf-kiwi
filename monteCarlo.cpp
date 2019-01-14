@@ -24,13 +24,13 @@ map<float, vector<vector<tuple<string, int> > > > monteCarloWrapper(vector<strin
         }
     }
 
-    extensionSide = 1.0;
-    for( auto key : keysCR) {
-        paths = monteCarlo(key, extensionSide, keysCR, groupedCR, keysRR, groupedRR, maxDepth, nTimes);
-        for( auto path : paths) {
-            pathsMap[extensionSide].push_back(path);
-        }
-    }
+    // extensionSide = 1.0;
+    // for( auto key : keysCR) {
+    //     paths = monteCarlo(key, extensionSide, keysCR, groupedCR, keysRR, groupedRR, maxDepth, nTimes);
+    //     for( auto path : paths) {
+    //         pathsMap[extensionSide].push_back(path);
+    //     }
+    // }
 
     return pathsMap;
 }
@@ -43,6 +43,7 @@ vector<vector<tuple<string, int> > > monteCarlo(string start, float side, vector
     // int nTimes = 1000;
     int nGoals = 0;
     int flag = 0;
+    // cout << "Begin MC for contig " << start << endl;
     for( int i = 0; i < nTimes; i++){
         flag = 0;
         path = mcSearch(start, side, keysCR, groupedCR, keysRR, groupedRR, maxDepth);
@@ -75,14 +76,16 @@ vector<vector<tuple<string, int> > > monteCarlo(string start, float side, vector
             }
         }
         if( path.size() > 1 && flag == 0){
+            string read;
+            int number;
+            for( auto element : path) {
+                tie(read, number) = element;
+                cout << read << " " << number << endl;
+            }
             nGoals += 1;
             paths.push_back(path);
         }
         cout << "Trial:" << i << " " << "Paths found:" << nGoals << endl;
-        // for( auto element : path) {
-            // tie(read, number) = element;
-            // cout << read << " " << number << '\n';
-        // }
     }
 
     return paths;
@@ -108,7 +111,7 @@ vector<tuple<string, int> > mcSearch(string start, float side, vector<string> ke
 
         string currentTarget = stack.back();
         stack.pop_back();
-        // cout << path.size() << endl;
+        cout << path.size() << currentTarget << endl;
         if( path.size() <= maxDepth) {
             if ( std::find(keysCR.begin(), keysCR.end(), currentTarget) != keysCR.end() ) {
                 // path.push_back(make_tuple(currentTarget, -1));
@@ -213,9 +216,9 @@ tuple<string, int> getMCReadForRead(string read, float side, string startContig,
 
     for( auto query : groupedRR[read]){
         for( int i = 0; i < query.second.size(); i++) {
-            // cout << read << query.first << endl;
             // cout << side << " " << query.second[i][0] << endl;
             if( side == query.second[i][0]){
+                // cout << read << query.first << endl;
                 if( query.second[i][1] > 0) {
                     offset += query.second[i][1];
                     if( offset > pick) {

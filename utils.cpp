@@ -36,7 +36,11 @@ void loadData(string path, vector<string> &queryNames, vector<int> &queryLens, v
 
             linestream >> qLen >> qStart >> qEnd >> strand >> tName >> tLen >> tStart >> tEnd >> resMatch >> bLen;
 
-            int si = resMatch / bLen;
+            if( qName == tName) {
+                continue;
+            }
+
+            float si = resMatch / bLen;
 
             if( si > SImin) {
                 queryNames.push_back(qName);

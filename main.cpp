@@ -18,6 +18,11 @@ int main() {
     string pathFastaCtgs = "data/EColi-synthetic/ecoli_test_contigs.fasta";
     string pathFastaReads = "data/EColi-synthetic/ecoli_test_reads.fasta";
 
+    // string pathCR = "data/CJejuni-real/overlaps-c-r.paf";
+    // string pathRR = "data/CJejuni-real/overlaps-r-r.paf";
+    // string pathFastaCtgs = "data/CJejuni-real/CJejuni-contigs.fasta";
+    // string pathFastaReads = "data/CJejuni-real/CJejuni-contigs.fasta";
+
     vector<string> queryNames;
     vector<int> queryLens;
     vector<float> queryStarts;
@@ -33,7 +38,7 @@ int main() {
 
     vector<float> extensionSides; // 1 is right, 0 is left
     vector<float> SI;
-    float SImin = 0.9;
+    float SImin = 0.7;
     vector<float> OL1;
     vector<float> OL2;
     vector<float> OH1;
@@ -93,8 +98,9 @@ int main() {
     ES2.clear();
 
     loadData(pathRR, queryNames, queryLens, queryStarts, queryEnds, targetNames, targetLens, targetStarts, targetEnds, resMatches, blockLens, SI, SImin);
-
+    // cout << queryNames.size() << endl;
     filterContained(queryNames, queryLens, queryStarts, queryEnds, targetNames, targetLens, targetStarts, targetEnds, resMatches, blockLens, extensionSides);
+    // cout << queryNames.size() << endl;
     // calculateSI(SI, resMatches, blockLens);
     // cout << "SI loaded" << endl;
     // filterBySI(0.3, queryNames, queryLens, queryStarts, queryEnds, targetNames, targetLens, targetStarts, targetEnds, resMatches, blockLens, extensionSides, SI);
@@ -117,7 +123,7 @@ int main() {
     }
 
     cout << "RR loaded" << endl;
-
+    // cout << groupedRR["m161108_211237_00127_c101051402550000001823235612291637_s1_p0/100336/0_19619"]["m161103_175158_00127_c101051712550000001823235612291635_s1_p0/140004/0_2390"][0][0] << endl;
     // for( auto x : groupedCR){
     //     cout << x.first << " contains:" << endl;
     //     for( auto y : x.second){
@@ -141,8 +147,12 @@ int main() {
     // }
 
     map<float, vector<vector<tuple<string, int> > > > paths;
-    int maxDepth = 30;
-    int nTimes = 2;
+    int maxDepth = 50;
+    int nTimes = 50;
+    // keysCR.clear();
+    // keysCR.push_back("ctg1");
+    // monteCarlo("ctg2", 0.0, keysCR, groupedCR, keysRR, groupedRR, maxDepth, nTimes);
+
     paths = monteCarloWrapper(keysCR, groupedCR, keysRR, groupedRR, maxDepth, nTimes);
     // string read;
     // int number;
@@ -175,8 +185,8 @@ int main() {
     //     }
     // }
 
-    string read;
-    int number;
+    // string read;
+    // int number;
     for( auto key : pathsMapLeft){
         cout << get<0>(key.first) << " " << get<1>(key.first) << " paths:" << endl;
         // for( auto p : key.second){
@@ -192,9 +202,20 @@ int main() {
     vector<tuple<string, string> > scaffoldContigs;
     scaffoldContigs = getScaffoldContigs(keysCR.size(), pathsMapLeft);
 
-    for( auto tapl : scaffoldContigs) {
-        cout << get<0>(tapl) << " " << get<1>(tapl) << endl;
+    map<tuple<string, string>, vector<tuple<string, int> > > chosenPaths;
+    for( auto key : scaffoldContigs) {
+        chosenPaths[key] = pathsMapLeft[key][0];
     }
+
+    for( auto tapl : scaffoldContigs) {
+        cout << "da" << get<0>(tapl) << " " << get<1>(tapl) << endl;
+    }
+    for( auto tapl : chosenPaths) {
+        cout << "ne" << get<0>(tapl.first) << " " << get<1>(tapl.first) << endl;
+    }
+
+    vector<vector<tuple<string, int> > > finalOrder;
+    finalOrder = buildFinalScaffoldOrder(chosenPaths);
 
     map<string, string> fastaReads;
     // fastaReads = loadFasta(pathFastaReads);
