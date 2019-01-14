@@ -1,6 +1,7 @@
 #include <vector>
 #include <map>
 #include <iostream>
+#include <fstream>
 #include <typeinfo>
 #include <random>
 #include <algorithm>
@@ -10,8 +11,8 @@
 using namespace std;
 
 string build_fasta_file(vector<tuple<string, int> > final_path,
-                        map<string, map<string, vector<vector<float> > > > groupedCR, 
-                        vector<string> keysCR, 
+                        map<string, map<string, vector<vector<float> > > > groupedCR,
+                        vector<string> keysCR,
                         map<string, map<string, vector<vector<float> > > > groupedRR,
                         vector<string> keysRR,
                         map<string, string> fastaReads,
@@ -65,5 +66,12 @@ string build_fasta_file(vector<tuple<string, int> > final_path,
         }
     }
     return fastaString;
-    
+
+}
+
+void saveFasta(string fasta, string path) {
+      ofstream myfile;
+      myfile.open (path);
+      myfile << fasta;
+      myfile.close();
 }

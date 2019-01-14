@@ -17,8 +17,20 @@ map<float, vector<vector<tuple<string, int> > > > monteCarloWrapper(vector<strin
 
     float extensionSide = 0.0;
 
+    reverse(keysCR.begin(), keysCR.end());
+    int number = keysCR.size() - 1;
     for( auto key : keysCR) {
-        paths = monteCarlo(key, extensionSide, keysCR, groupedCR, keysRR, groupedRR, maxDepth, nTimes);
+        if( number == 0) {
+            break;
+        }
+        vector<string>::const_iterator first = keysCR.begin() + keysCR.size() - number;
+        vector<string>::const_iterator last = keysCR.begin() + keysCR.size() - number + 1;
+        number -= 1;
+        vector<string> newVec(first, last);
+        for( auto contig : newVec) {
+            cout << key << " newvec " << contig << endl;
+        }
+        paths = monteCarlo(key, extensionSide, newVec, groupedCR, keysRR, groupedRR, maxDepth, nTimes);
         for( auto path : paths) {
             pathsMap[extensionSide].push_back(path);
         }

@@ -18,6 +18,7 @@ int main() {
     string pathRR = "data/EColi-synthetic/overlaps-r-r.paf";
     string pathFastaCtgs = "data/EColi-synthetic/ecoli_test_contigs.fasta";
     string pathFastaReads = "data/EColi-synthetic/ecoli_test_reads.fasta";
+    string pathFastaOut = "data/EColi-synthetic/final.fasta";
 
     // string pathCR = "data/CJejuni-real/overlaps-c-r.paf";
     // string pathRR = "data/CJejuni-real/overlaps-r-r.paf";
@@ -149,7 +150,7 @@ int main() {
 
     map<float, vector<vector<tuple<string, int> > > > paths;
     int maxDepth = 50;
-    int nTimes = 50;
+    int nTimes = 10;
     // keysCR.clear();
     // keysCR.push_back("ctg1");
     // monteCarlo("ctg2", 0.0, keysCR, groupedCR, keysRR, groupedRR, maxDepth, nTimes);
@@ -215,8 +216,8 @@ int main() {
         cout << "ne" << get<0>(tapl.first) << " " << get<1>(tapl.first) << endl;
     }
 
-    vector<vector<tuple<string, int> > > finalOrder;
-    finalOrder = buildFinalScaffoldOrder(chosenPaths);
+    vector<tuple<string, int> >finalOrder;
+    finalOrder = buildFinalScaffoldOrder(chosenPaths, scaffoldContigs);
 
     map<string, string> fastaReads;
     fastaReads = loadFasta(pathFastaReads);
@@ -224,8 +225,10 @@ int main() {
     map<string, string> fastaContigs;
     fastaContigs = loadFasta(pathFastaCtgs);
 
+    string fastaString;
+    fastaString = build_fasta_file(finalOrder, groupedCR, keysCR, groupedRR, keysRR, fastaReads, fastaContigs);
 
-
+    saveFasta(fastaString, pathFastaOut);
     // allPaths = monteCarlo(keysCR[2], 0, keysCR, groupedCR, keysRR, groupedRR, maxDepth);
     // cout << proba[targetNames[0]][queryNames[0]][0] << '\n';
     // cout << queryLens[0] << '\n';
