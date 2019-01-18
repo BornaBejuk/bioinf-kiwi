@@ -6,14 +6,17 @@
 #include <algorithm>
 
 #include "monteCarlo.hpp"
+#include "utils.hpp"
+
+typedef std::chrono::high_resolution_clock Clock;
 
 using namespace std;
 
 // author: Karlo Brajdic
 
 // wrapper function which calls monte-carlo for every contig
-map<float, vector<vector<tuple<string, int> > > > monteCarloWrapper(vector<string> keysCR, map<string, map<string, vector<vector<float> > > > groupedCR, vector<string> keysRR,
-                                                                    map<string, map<string, vector<vector<float> > > > groupedRR, int maxDepth, int nTimes) {
+map<float, vector<vector<tuple<string, int> > > > monteCarloWrapper(vector<string> keysCR, map<string, map<string, vector<vector<float> > > > &groupedCR, vector<string> keysRR,
+                                                                    map<string, map<string, vector<vector<float> > > > &groupedRR, int maxDepth, int nTimes) {
 
     map<float, vector<vector<tuple<string, int> > > > pathsMap;
     vector<vector<tuple<string, int> > > paths;
@@ -35,7 +38,6 @@ map<float, vector<vector<tuple<string, int> > > > monteCarloWrapper(vector<strin
         // }
         // paths = monteCarlo(key, extensionSide, newVec, groupedCR, keysRR, groupedRR, maxDepth, nTimes);
         paths = monteCarlo(key, extensionSide, keysCR, groupedCR, keysRR, groupedRR, maxDepth, nTimes);
-
         for( auto path : paths) {
             pathsMap[extensionSide].push_back(path);
         }
@@ -63,8 +65,8 @@ map<float, vector<vector<tuple<string, int> > > > monteCarloWrapper(vector<strin
 }
 
 // function which repeats monte-carlo search nTimes for given starting contig
-vector<vector<tuple<string, int> > > monteCarlo(string start, float side, vector<string> keysCR, map<string, map<string, vector<vector<float> > > > groupedCR,
-                        vector<string> keysRR, map<string, map<string, vector<vector<float> > > > groupedRR, int maxDepth, int nTimes){
+vector<vector<tuple<string, int> > > monteCarlo(string start, float side, vector<string> keysCR, map<string, map<string, vector<vector<float> > > > &groupedCR,
+                        vector<string> keysRR, map<string, map<string, vector<vector<float> > > > &groupedRR, int maxDepth, int nTimes){
 
     vector<vector<tuple<string, int> > > paths;
     vector<tuple<string, int> > path;
@@ -123,8 +125,8 @@ vector<vector<tuple<string, int> > > monteCarlo(string start, float side, vector
 }
 
 // function which tries to find path between two contigs
-vector<tuple<string, int> > mcSearch(string start, float side, vector<string> keysCR, map<string, map<string, vector<vector<float> > > > groupedCR,
-                        vector<string> keysRR, map<string, map<string, vector<vector<float> > > > groupedRR, int maxDepth) {
+vector<tuple<string, int> > mcSearch(string start, float side, vector<string> keysCR, map<string, map<string, vector<vector<float> > > > &groupedCR,
+                        vector<string> keysRR, map<string, map<string, vector<vector<float> > > > &groupedRR, int maxDepth) {
 
     vector<tuple<string, int> > path;
     vector<string> stack;
@@ -136,10 +138,8 @@ vector<tuple<string, int> > mcSearch(string start, float side, vector<string> ke
     tie(read, number) = getMCReadForContig(start, side, groupedCR);
     // cout << read << ' ' << number << endl;
     path.push_back(make_tuple(read, number));
-
     stack.push_back(read);
     while( !stack.empty()) {
-
         string currentTarget = stack.back();
         stack.pop_back();
         cout << "Current path length: " << path.size() << endl;
@@ -164,10 +164,9 @@ vector<tuple<string, int> > mcSearch(string start, float side, vector<string> ke
 }
 
 // function which returns read for given contig using roulette wheel probability scheme
-tuple<string, int> getMCReadForContig(string contig, float side, map<string, map<string, vector<vector<float> > > > groupedCR) {
+tuple<string, int> getMCReadForContig(string contig, float side, map<string, map<string, vector<vector<float> > > > &groupedCR) {
 
     float sum = 0.0;
-
     for( auto query : groupedCR[contig]){
         for( int i = 0; i < query.second.size(); i++) {
             // cout << i << endl;
@@ -205,7 +204,7 @@ tuple<string, int> getMCReadForContig(string contig, float side, map<string, map
 }
 
 // function which returns read for given read using roulette wheel probability scheme
-tuple<string, int> getMCReadForRead(string read, float side, string startContig, map<string, map<string, vector<vector<float> > > > groupedCR, map<string, map<string, vector<vector<float> > > > groupedRR) {
+tuple<string, int> getMCReadForRead(string read, float side, string startContig, map<string, map<string, vector<vector<float> > > > &groupedCR, map<string, map<string, vector<vector<float> > > > &groupedRR) {
 
     // try to find contig == goal
     for( auto target : groupedCR) {

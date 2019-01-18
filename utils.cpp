@@ -4,7 +4,10 @@
 #include <sstream>
 #include <map>
 
+#include <chrono>
+
 using namespace std;
+typedef std::chrono::high_resolution_clock Clock;
 
 // author: Karlo Brajidc
 
@@ -226,4 +229,10 @@ map<string, string> loadFasta(string path) {
         }
     }
     return fasta;
+}
+
+void timeIt(std::chrono::_V2::system_clock::time_point& start, std::string action){
+  std::chrono::duration<double> elapsed = Clock::now() - start;
+  cout << "\033[92m" << action << " done in: " << elapsed.count() << " seconds.\033[0m\n\n";
+  start = Clock::now();
 }

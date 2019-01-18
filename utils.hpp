@@ -1,4 +1,5 @@
 #include <vector>
+#include <chrono>
 
 using namespace std;
 
@@ -35,3 +36,5 @@ void calculateOS(vector<float> &OS, vector<float> &OL1, vector<float> &OL2, vect
 void calculateES(vector<float> &ES1, vector<float> &ES2, vector<float> &OS, vector<float> &EL1, vector<float> &EL2, vector<float> &OH1, vector<float> &OH2);
 
 map<string, string> loadFasta(string path);
+
+void timeIt(std::chrono::_V2::system_clock::time_point& start, std::string action);

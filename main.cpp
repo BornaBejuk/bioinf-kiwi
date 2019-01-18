@@ -57,7 +57,7 @@ int main() {
 
     vector<float> extensionSides; // 1 is right, 0 is left
     vector<float> SI;
-    float SImin = 0.6;
+    float SImin = 0.8;
     vector<float> OL1;
     vector<float> OL2;
     vector<float> OH1;
@@ -167,7 +167,7 @@ int main() {
 
     map<float, vector<vector<tuple<string, int> > > > paths;
     int maxDepth = 50;
-    int nTimes = 2;
+    int nTimes = 50;
     // keysCR.clear();
     // keysCR.push_back("ctg1");
     // monteCarlo("ctg2", 0.0, keysCR, groupedCR, keysRR, groupedRR, maxDepth, nTimes);
@@ -235,10 +235,10 @@ int main() {
     scaffoldContigs = getScaffoldContigs(keysCR.size(), pathsMapLeft);
 
     map<tuple<string, string>, vector<tuple<string, int> > > chosenPaths;
-    chosenPaths = mapConsensusPath(dividePathsIntoGroups(pathLengthsMap, 10));
-    // for( auto key : scaffoldContigs) {
-    //     chosenPaths[key] = pathsMapLeft[key][0];
-    // }
+    // chosenPaths = mapConsensusPath(dividePathsIntoGroups(pathLengthsMap, 10));
+    for( auto key : scaffoldContigs) {
+        chosenPaths[key] = pathsMapLeft[key][0];
+    }
 
     // for( auto tapl : scaffoldContigs) {
     //     cout << "da" << get<0>(tapl) << " " << get<1>(tapl) << endl;
