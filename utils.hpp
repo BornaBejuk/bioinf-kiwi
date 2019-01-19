@@ -6,7 +6,11 @@ using namespace std;
 void loadData(string path, vector<string> &queryNames, vector<int> &queryLens, vector<float> &queryStarts,
             vector<float> &queryEnds, vector<string> &targetNames, vector<int> &targetLens,
             vector<float> &targetStarts, vector<float> &targetEnds, vector<float> &resMatches,
-            vector<float> &blockLens, vector<float> &SI, float SImin);
+            vector<float> &blockLens, vector<float> &SI, float SImin, vector<float> &extensionSides);
+
+bool extendRight(float queryEnd, int queryLen, float targetEnd, int targetLen);
+
+bool extendLeft(float queryStart, float targetStart);
 
 void filterContained(vector<string> &queryNames, vector<int> &queryLens, vector<float> &queryStarts,
             vector<float> &queryEnds, vector<string> &targetNames, vector<int> &targetLens,

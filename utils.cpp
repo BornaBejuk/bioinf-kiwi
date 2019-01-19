@@ -3,8 +3,10 @@
 #include <vector>
 #include <sstream>
 #include <map>
-
 #include <chrono>
+
+
+#include "utils.hpp"
 
 using namespace std;
 typedef std::chrono::high_resolution_clock Clock;
@@ -15,7 +17,7 @@ typedef std::chrono::high_resolution_clock Clock;
 void loadData(string path, vector<string> &queryNames, vector<int> &queryLens, vector<float> &queryStarts,
             vector<float> &queryEnds, vector<string> &targetNames, vector<int> &targetLens,
             vector<float> &targetStarts, vector<float> &targetEnds, vector<float> &resMatches,
-            vector<float> &blockLens, vector<float> &SI, float SImin) {
+            vector<float> &blockLens, vector<float> &SI, float SImin, vector<float> &extensionSides) {
 
     string line;
 
@@ -52,6 +54,13 @@ void loadData(string path, vector<string> &queryNames, vector<int> &queryLens, v
             counter += 1;
             // cout << si << endl;
             if( si > SImin) {
+                if( extendRight(qEnd, qLen, tEnd, tLen)) {
+                    extensionSides.push_back(1);
+                } else if( extendLeft(qStart, tStart)) {
+                    extensionSides.push_back(0);
+                } else {
+                    continue;
+                }
                 queryNames.push_back(qName);
                 queryLens.push_back(qLen);
                 queryStarts.push_back(qStart);
@@ -92,6 +101,7 @@ void filterContained(vector<string> &queryNames, vector<int> &queryLens, vector<
         } else if( extendLeft(queryStarts[i], targetStarts[i])) {
             extensionSides.push_back(0);
         } else {
+            // cout << queryNames[i] << " " << targetNames[i] << " " << resMatches[i] << endl;
             queryNames.erase(queryNames.begin() + i);
             queryLens.erase(queryLens.begin() + i);
             queryStarts.erase(queryStarts.begin() + i);

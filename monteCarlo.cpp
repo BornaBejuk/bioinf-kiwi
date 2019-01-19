@@ -43,23 +43,23 @@ map<float, vector<vector<tuple<string, int> > > > monteCarloWrapper(vector<strin
         }
     }
 
-    // extensionSide = 1.0;
-    // for( auto key : keysCR) {
-    // //     if( number == 0) {
-    // //         break;
-    // //     }
-    // //     vector<string>::const_iterator first = keysCR.begin() + keysCR.size() - number;
-    // //     vector<string>::const_iterator last = keysCR.begin() + keysCR.size() - number + 1;
-    // //     number -= 1;
-    // //     vector<string> newVec(first, last);
-    // //     for( auto contig : newVec) {
-    // //         cout << key << " newvec " << contig << endl;
-    // //     }
-    //     paths = monteCarlo(key, extensionSide, keysCR, groupedCR, keysRR, groupedRR, maxDepth, nTimes);
-    //     for( auto path : paths) {
-    //         pathsMap[extensionSide].push_back(path);
+    extensionSide = 1.0;
+    for( auto key : keysCR) {
+    //     if( number == 0) {
+    //         break;
     //     }
-    // }
+    //     vector<string>::const_iterator first = keysCR.begin() + keysCR.size() - number;
+    //     vector<string>::const_iterator last = keysCR.begin() + keysCR.size() - number + 1;
+    //     number -= 1;
+    //     vector<string> newVec(first, last);
+    //     for( auto contig : newVec) {
+    //         cout << key << " newvec " << contig << endl;
+    //     }
+        paths = monteCarlo(key, extensionSide, keysCR, groupedCR, keysRR, groupedRR, maxDepth, nTimes);
+        for( auto path : paths) {
+            pathsMap[extensionSide].push_back(path);
+        }
+    }
 
     return pathsMap;
 }
@@ -118,7 +118,7 @@ vector<vector<tuple<string, int> > > monteCarlo(string start, float side, vector
             nGoals += 1;
             paths.push_back(path);
         }
-        cout << "Trial:" << i << " " << "Paths found:" << nGoals << endl;
+        // cout << "Trial:" << i << " " << "Paths found:" << nGoals << endl;
     }
 
     return paths;
@@ -142,16 +142,26 @@ vector<tuple<string, int> > mcSearch(string start, float side, vector<string> ke
     while( !stack.empty()) {
         string currentTarget = stack.back();
         stack.pop_back();
-        cout << "Current path length: " << path.size() << endl;
         if( path.size() <= maxDepth) {
             if ( std::find(keysCR.begin(), keysCR.end(), currentTarget) != keysCR.end() ) {
+                // cout << "Current path length: " << path.size() << endl;
                 // path.push_back(make_tuple(currentTarget, -1));
                 return path;
             }
             else {
-                tie(read, number) = getMCReadForRead(currentTarget, side, start, groupedCR, groupedRR);
-                if( number == -2) {
-                    break;
+                while(true) {
+                    tie(read, number) = getMCReadForRead(currentTarget, side, start, groupedCR, groupedRR);
+                    if( number == -2) {
+                        break;
+                    }
+                    if ( std::find(path.begin(), path.end(), make_tuple(read ,number)) != path.end() ) {
+                        cout << "Duplicate!!!!!!!!!!!! " << read << number << endl;
+                        for(auto tapl : path){
+                            cout << get<0>(tapl) << get<1>(tapl) << endl;
+                        }
+                    } else {
+                        break;
+                    }
                 }
                 // cout << "Nasel sam:" << currentTarget << ' ' << read << number << endl;
                 path.push_back(make_tuple(read, number));

@@ -10,23 +10,25 @@
 #include "scaffolding.hpp"
 #include "buildFasta.hpp"
 
+typedef std::chrono::high_resolution_clock Clock;
+
 using namespace std;
 
 // authors: Karlo Brajdic
 
 int main() {
 
-    string pathCR = "data/EColi-synthetic/overlaps-c-r.paf";
-    string pathRR = "data/EColi-synthetic/overlaps-r-r.paf";
-    string pathFastaCtgs = "data/EColi-synthetic/ecoli_test_contigs.fasta";
-    string pathFastaReads = "data/EColi-synthetic/ecoli_test_reads.fasta";
-    string pathFastaOut = "data/EColi-synthetic/final.fasta";
+    // string pathCR = "data/EColi-synthetic/overlaps-c-r.paf";
+    // string pathRR = "data/EColi-synthetic/overlaps-r-r.paf";
+    // string pathFastaCtgs = "data/EColi-synthetic/ecoli_test_contigs.fasta";
+    // string pathFastaReads = "data/EColi-synthetic/ecoli_test_reads.fasta";
+    // string pathFastaOut = "data/EColi-synthetic/final.fasta";
 
-    // string pathCR = "data/CJejuni-real/overlaps-c-r.paf";
-    // string pathRR = "data/CJejuni-real/overlaps-r-r.paf";
-    // string pathFastaCtgs = "data/CJejuni-real/CJejuni-contigs.fasta";
-    // string pathFastaReads = "data/CJejuni-real/CJejuni-reads.fastq";
-    // string pathFastaOut = "data/CJejuni-real/final.fasta";
+    string pathCR = "data/CJejuni-real/overlaps-c-r.paf";
+    string pathRR = "data/CJejuni-real/overlaps-r-r.paf";
+    string pathFastaCtgs = "data/CJejuni-real/CJejuni-contigs.fasta";
+    string pathFastaReads = "data/CJejuni-real/CJejuni-reads.fastq";
+    string pathFastaOut = "data/CJejuni-real/final.fasta";
 
     // string pathCR = "data/BGrahamii-real/overlaps-c-r.paf";
     // string pathRR = "data/BGrahamii-real/overlaps-r-r.paf";
@@ -57,7 +59,7 @@ int main() {
 
     vector<float> extensionSides; // 1 is right, 0 is left
     vector<float> SI;
-    float SImin = 0.8;
+    float SImin = 0.5;
     vector<float> OL1;
     vector<float> OL2;
     vector<float> OH1;
@@ -68,8 +70,8 @@ int main() {
     vector<float> ES1;
     vector<float> ES2;
 
-    loadData(pathCR, queryNames, queryLens, queryStarts, queryEnds, targetNames, targetLens, targetStarts, targetEnds, resMatches, blockLens, SI, SImin);
-    filterContained(queryNames, queryLens, queryStarts, queryEnds, targetNames, targetLens, targetStarts, targetEnds, resMatches, blockLens, extensionSides);
+    loadData(pathCR, queryNames, queryLens, queryStarts, queryEnds, targetNames, targetLens, targetStarts, targetEnds, resMatches, blockLens, SI, SImin, extensionSides);
+    // filterContained(queryNames, queryLens, queryStarts, queryEnds, targetNames, targetLens, targetStarts, targetEnds, resMatches, blockLens, extensionSides);
 
     calculateSI(SI, resMatches, blockLens);
     filterBySI(SImin, queryNames, queryLens, queryStarts, queryEnds, targetNames, targetLens, targetStarts, targetEnds, resMatches, blockLens, extensionSides, SI);
@@ -116,9 +118,11 @@ int main() {
     ES1.clear();
     ES2.clear();
 
-    loadData(pathRR, queryNames, queryLens, queryStarts, queryEnds, targetNames, targetLens, targetStarts, targetEnds, resMatches, blockLens, SI, SImin);
+    // auto startTime = Clock::now();
+    loadData(pathRR, queryNames, queryLens, queryStarts, queryEnds, targetNames, targetLens, targetStarts, targetEnds, resMatches, blockLens, SI, SImin, extensionSides);
+    // timeIt(startTime, "filter contained");
     // cout << queryNames.size() << endl;
-    filterContained(queryNames, queryLens, queryStarts, queryEnds, targetNames, targetLens, targetStarts, targetEnds, resMatches, blockLens, extensionSides);
+    // filterContained(queryNames, queryLens, queryStarts, queryEnds, targetNames, targetLens, targetStarts, targetEnds, resMatches, blockLens, extensionSides);
     // cout << queryNames.size() << endl;
     // calculateSI(SI, resMatches, blockLens);
     // cout << "SI loaded" << endl;
@@ -142,6 +146,7 @@ int main() {
     }
 
     cout << "RR loaded" << endl;
+    exit(1);
     // cout << groupedRR["m161108_211237_00127_c101051402550000001823235612291637_s1_p0/100336/0_19619"]["m161103_175158_00127_c101051712550000001823235612291635_s1_p0/140004/0_2390"][0][0] << endl;
     // for( auto x : groupedCR){
     //     cout << x.first << " contains:" << endl;
@@ -166,8 +171,8 @@ int main() {
     // }
 
     map<float, vector<vector<tuple<string, int> > > > paths;
-    int maxDepth = 50;
-    int nTimes = 50;
+    int maxDepth = 70;
+    int nTimes = 100;
     // keysCR.clear();
     // keysCR.push_back("ctg1");
     // monteCarlo("ctg2", 0.0, keysCR, groupedCR, keysRR, groupedRR, maxDepth, nTimes);
@@ -189,13 +194,13 @@ int main() {
 
     // TODO concatenate them or change mapPaths to work with both paths
     map<tuple<string, string>, vector<vector<tuple<string, int> > > >  pathsMapLeft;
-    // map<tuple<string, string>, vector<vector<tuple<string, int> > > >  pathsMapRight;
+    map<tuple<string, string>, vector<vector<tuple<string, int> > > >  pathsMapRight;
     pathsMapLeft = mapPaths(0.0, paths);
-    // pathsMapRight = mapPaths(1.0, paths);
+    pathsMapRight = mapPaths(1.0, paths);
 
     // paths are now in one map, regardless of extension side
-    map<tuple<string, string>, vector<tuple<vector<tuple<string, int> >, float> > > pathLengthsMap;
-    pathLengthsMap = calculatePathLengths(pathsMapLeft, groupedCR, groupedRR);
+    // map<tuple<string, string>, vector<tuple<vector<tuple<string, int> >, float> > > pathLengthsMap;
+    // pathLengthsMap = calculatePathLengths(pathsMapLeft, groupedCR, groupedRR);
 
     // for( auto key : pathLengthsMap) {
     //     for( auto tapl : key.second) {
@@ -218,17 +223,17 @@ int main() {
         //     cout << endl;
         // }
     }
-    // cout << "Paths right: " << endl;
-    // for( auto key : pathsMapRight){
-    //     cout << get<0>(key.first) << " " << get<1>(key.first) << " paths: " << key.second.size() << endl;
-    //     // for( auto p : key.second){
-    //     //     for( auto element : p) {
-    //     //         tie(read, number) = element;
-    //     //         cout << read << " " << number << '\n';
-    //     //     }
-    //     //     cout << endl;
-    //     // }
-    // }
+    cout << "Paths right: " << endl;
+    for( auto key : pathsMapRight){
+        cout << get<0>(key.first) << " " << get<1>(key.first) << " paths: " << key.second.size() << endl;
+        // for( auto p : key.second){
+        //     for( auto element : p) {
+        //         tie(read, number) = element;
+        //         cout << read << " " << number << '\n';
+        //     }
+        //     cout << endl;
+        // }
+    }
 
 
     vector<tuple<string, string> > scaffoldContigs;
