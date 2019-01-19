@@ -14,4 +14,4 @@ vector<tuple<string, int> > mcSearch(string start, float side, vector<string> ke
 
 tuple<string, int> getMCReadForContig(string contig, float side, map<string, map<string, vector<vector<float> > > > &groupedCR);
 
-tuple<string, int> getMCReadForRead(string read, float side, string startContig, map<string, map<string, vector<vector<float> > > > &groupedCR, map<string, map<string, vector<vector<float> > > > &groupedRR);
+tuple<string, int> getMCReadForRead(string read, float side, string startContig, map<string, map<string, vector<vector<float> > > > &groupedCR, map<string, map<string, vector<vector<float> > > > &groupedRR, vector<tuple<string, int> > &path);

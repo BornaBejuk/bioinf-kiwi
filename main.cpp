@@ -59,7 +59,7 @@ int main() {
 
     vector<float> extensionSides; // 1 is right, 0 is left
     vector<float> SI;
-    float SImin = 0.5;
+    float SImin = 0.6;
     vector<float> OL1;
     vector<float> OL2;
     vector<float> OH1;
@@ -146,7 +146,6 @@ int main() {
     }
 
     cout << "RR loaded" << endl;
-    exit(1);
     // cout << groupedRR["m161108_211237_00127_c101051402550000001823235612291637_s1_p0/100336/0_19619"]["m161103_175158_00127_c101051712550000001823235612291635_s1_p0/140004/0_2390"][0][0] << endl;
     // for( auto x : groupedCR){
     //     cout << x.first << " contains:" << endl;
@@ -172,7 +171,7 @@ int main() {
 
     map<float, vector<vector<tuple<string, int> > > > paths;
     int maxDepth = 70;
-    int nTimes = 100;
+    int nTimes = 200;
     // keysCR.clear();
     // keysCR.push_back("ctg1");
     // monteCarlo("ctg2", 0.0, keysCR, groupedCR, keysRR, groupedRR, maxDepth, nTimes);
@@ -199,15 +198,15 @@ int main() {
     pathsMapRight = mapPaths(1.0, paths);
 
     // paths are now in one map, regardless of extension side
-    // map<tuple<string, string>, vector<tuple<vector<tuple<string, int> >, float> > > pathLengthsMap;
-    // pathLengthsMap = calculatePathLengths(pathsMapLeft, groupedCR, groupedRR);
+    map<tuple<string, string>, vector<tuple<vector<tuple<string, int> >, float> > > pathLengthsMap;
+    pathLengthsMap = calculatePathLengths(pathsMapLeft, groupedCR, groupedRR);
 
-    // for( auto key : pathLengthsMap) {
-    //     for( auto tapl : key.second) {
-    //         float length = get<1>(tapl);
-    //         cout << get<0>(key.first) << "->" << get<1>(key.first) << ":" << (int) length << endl;
-    //     }
-    // }
+    for( auto key : pathLengthsMap) {
+        for( auto tapl : key.second) {
+            float length = get<1>(tapl);
+            cout << get<0>(key.first) << "->" << get<1>(key.first) << ":" << (int) length << endl;
+        }
+    }
 
     // string read;
     // int number;

@@ -144,13 +144,13 @@ vector<tuple<string, int> > mcSearch(string start, float side, vector<string> ke
         stack.pop_back();
         if( path.size() <= maxDepth) {
             if ( std::find(keysCR.begin(), keysCR.end(), currentTarget) != keysCR.end() ) {
-                // cout << "Current path length: " << path.size() << endl;
+                cout << "Current path length: " << path.size() << endl;
                 // path.push_back(make_tuple(currentTarget, -1));
                 return path;
             }
             else {
                 while(true) {
-                    tie(read, number) = getMCReadForRead(currentTarget, side, start, groupedCR, groupedRR);
+                    tie(read, number) = getMCReadForRead(currentTarget, side, start, groupedCR, groupedRR, path);
                     if( number == -2) {
                         break;
                     }
@@ -214,7 +214,7 @@ tuple<string, int> getMCReadForContig(string contig, float side, map<string, map
 }
 
 // function which returns read for given read using roulette wheel probability scheme
-tuple<string, int> getMCReadForRead(string read, float side, string startContig, map<string, map<string, vector<vector<float> > > > &groupedCR, map<string, map<string, vector<vector<float> > > > &groupedRR) {
+tuple<string, int> getMCReadForRead(string read, float side, string startContig, map<string, map<string, vector<vector<float> > > > &groupedCR, map<string, map<string, vector<vector<float> > > > &groupedRR, vector<tuple<string, int> > &path) {
 
     // try to find contig == goal
     for( auto target : groupedCR) {
@@ -229,6 +229,10 @@ tuple<string, int> getMCReadForRead(string read, float side, string startContig,
                 // if extends from other side
                 if( side != query.second[i][0]){
                     // cout << "GOAL FOUND!" << target.first << endl;
+                    // remove the last read from path
+                    path.pop_back();
+                    // append the last read with corrected queryIndex
+                    path.push_back(make_tuple(query.first, i));
                     return make_tuple(target.first, -1);
                 }
             }
