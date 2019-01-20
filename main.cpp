@@ -59,7 +59,7 @@ int main() {
 
     vector<float> extensionSides; // 1 is right, 0 is left
     vector<float> SI;
-    float SImin = 0.4;
+    float SImin = 0.8;
     vector<float> OL1;
     vector<float> OL2;
     vector<float> OH1;
@@ -73,8 +73,8 @@ int main() {
     loadData(pathCR, queryNames, queryLens, queryStarts, queryEnds, targetNames, targetLens, targetStarts, targetEnds, resMatches, blockLens, SI, SImin, extensionSides);
     // filterContained(queryNames, queryLens, queryStarts, queryEnds, targetNames, targetLens, targetStarts, targetEnds, resMatches, blockLens, extensionSides);
 
-    calculateSI(SI, resMatches, blockLens);
-    filterBySI(SImin, queryNames, queryLens, queryStarts, queryEnds, targetNames, targetLens, targetStarts, targetEnds, resMatches, blockLens, extensionSides, SI);
+    // calculateSI(SI, resMatches, blockLens);
+    // filterBySI(SImin, queryNames, queryLens, queryStarts, queryEnds, targetNames, targetLens, targetStarts, targetEnds, resMatches, blockLens, extensionSides, SI);
     calculateOL(OL1, OL2, queryStarts, queryEnds, targetStarts, targetEnds);
     calculateOH(OH1, OH2, queryLens, queryStarts, queryEnds, targetLens, targetStarts, targetEnds, extensionSides);
     calculateEL(EL1, EL2, queryLens, queryStarts, queryEnds, targetLens, targetStarts, targetEnds, extensionSides);
@@ -83,7 +83,7 @@ int main() {
 
     map<string, map<string, vector<vector<float> > > > groupedCR;
     for( int i = 0; i < queryNames.size(); i++) {
-        vector<float> tmp = {extensionSides[i], ES2[i], OH1[i], OH2[i], EL1[i], EL2[i], OL2[i]};
+        vector<float> tmp = {extensionSides[i], ES2[i], OH1[i], OH2[i], EL1[i], EL2[i], OL2[i], OS[i], SI[i]};
         groupedCR[targetNames[i]][queryNames[i]].push_back(tmp);
     }
     vector<string> keysCR;
@@ -136,7 +136,7 @@ int main() {
 
     map<string, map<string, vector<vector<float> > > > groupedRR;
     for( int i = 0; i < queryNames.size(); i++) {
-        vector<float> tmp = {extensionSides[i], ES2[i], OH1[i], OH2[i], EL1[i], EL2[i]};
+        vector<float> tmp = {extensionSides[i], ES2[i], OH1[i], OH2[i], EL1[i], EL2[i], OS[i], SI[i]};
         groupedRR[targetNames[i]][queryNames[i]].push_back(tmp);
     }
 
@@ -170,8 +170,8 @@ int main() {
     // }
 
     map<float, vector<vector<tuple<string, int> > > > paths;
-    int maxDepth = 30;
-    int nTimes = 250;
+    int maxDepth = 70;
+    int nTimes = 10;
     // keysCR.clear();
     // keysCR.push_back("ctg1");
     // monteCarlo("ctg2", 0.0, keysCR, groupedCR, keysRR, groupedRR, maxDepth, nTimes);
