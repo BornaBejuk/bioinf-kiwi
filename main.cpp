@@ -18,27 +18,27 @@ using namespace std;
 
 int main() {
 
-    // string pathCR = "data/EColi-synthetic/overlaps-c-r.paf";
-    // string pathRR = "data/EColi-synthetic/overlaps-r-r.paf";
-    // string pathFastaCtgs = "data/EColi-synthetic/ecoli_test_contigs.fasta";
-    // string pathFastaReads = "data/EColi-synthetic/ecoli_test_reads.fasta";
-    // string pathFastaOut = "data/EColi-synthetic/final.fasta";
+    string pathCR = "data/EColi-synthetic/overlaps-c-r.paf";
+    string pathRR = "data/EColi-synthetic/overlaps-r-r.paf";
+    string pathFastaCtgs = "data/EColi-synthetic/ecoli_test_contigs.fasta";
+    string pathFastaReads = "data/EColi-synthetic/ecoli_test_reads.fasta";
+    string pathFastaOut = "data/EColi-synthetic/final.fasta";
 
-    string pathCR = "data/CJejuni-real/overlaps-c-r.paf";
-    string pathRR = "data/CJejuni-real/overlaps-r-r.paf";
-    string pathFastaCtgs = "data/CJejuni-real/CJejuni-contigs.fasta";
-    string pathFastaReads = "data/CJejuni-real/CJejuni-reads.fastq";
-    string pathFastaOut = "data/CJejuni-real/final.fasta";
+    // string pathCR = "data/CJejuni-real/overlaps-c-r.paf";
+    // string pathRR = "data/CJejuni-real/overlaps-r-r.paf";
+    // string pathFastaCtgs = "data/CJejuni-real/CJejuni-contigs.fasta";
+    // string pathFastaReads = "data/CJejuni-real/CJejuni-reads.fastq";
+    // string pathFastaOut = "data/CJejuni-real/final.fasta";
 
     // string pathCR = "data/BGrahamii-real/overlaps-c-r.paf";
     // string pathRR = "data/BGrahamii-real/overlaps-r-r.paf";
-    // string pathFastaCtgs = "ddata/BGrahamii-real/BGrahamii-contigs.fasta";
+    // string pathFastaCtgs = "data/BGrahamii-real/BGrahamii-contigs.fasta";
     // string pathFastaReads = "data/BGrahamii-real/BGrahamii-reads.fastq";
     // string pathFastaOut = "data/BGrahamii-real/final.fasta";
 
     // map<string, string> fastaReads1;
-    // // fastaReads1 = loadFasta(pathFastaReads);
-    //
+    // fastaReads1 = loadFasta(pathFastaReads);
+
     // map<string, string> fastaContigs1;
     // fastaContigs1 = loadFasta(pathFastaCtgs);
     // return 0;
@@ -59,7 +59,7 @@ int main() {
 
     vector<float> extensionSides; // 1 is right, 0 is left
     vector<float> SI;
-    float SImin = 0.6;
+    float SImin = 0.4;
     vector<float> OL1;
     vector<float> OL2;
     vector<float> OH1;
@@ -170,8 +170,8 @@ int main() {
     // }
 
     map<float, vector<vector<tuple<string, int> > > > paths;
-    int maxDepth = 70;
-    int nTimes = 200;
+    int maxDepth = 30;
+    int nTimes = 250;
     // keysCR.clear();
     // keysCR.push_back("ctg1");
     // monteCarlo("ctg2", 0.0, keysCR, groupedCR, keysRR, groupedRR, maxDepth, nTimes);
@@ -201,12 +201,12 @@ int main() {
     map<tuple<string, string>, vector<tuple<vector<tuple<string, int> >, float> > > pathLengthsMap;
     pathLengthsMap = calculatePathLengths(pathsMapLeft, groupedCR, groupedRR);
 
-    for( auto key : pathLengthsMap) {
-        for( auto tapl : key.second) {
-            float length = get<1>(tapl);
-            cout << get<0>(key.first) << "->" << get<1>(key.first) << ":" << (int) length << endl;
-        }
-    }
+    // for( auto key : pathLengthsMap) {
+    //     for( auto tapl : key.second) {
+    //         float length = get<1>(tapl);
+    //         cout << get<0>(key.first) << "->" << get<1>(key.first) << ":" << (int) length << endl;
+    //     }
+    // }
 
     // string read;
     // int number;
@@ -236,21 +236,27 @@ int main() {
 
 
     vector<tuple<string, string> > scaffoldContigs;
-    scaffoldContigs = getScaffoldContigs(keysCR.size(), pathsMapLeft);
+    scaffoldContigs = getScaffoldContigs2(keysCR.size(), pathsMapLeft, pathsMapRight);
 
-    map<tuple<string, string>, vector<tuple<string, int> > > chosenPaths;
-    // chosenPaths = mapConsensusPath(dividePathsIntoGroups(pathLengthsMap, 10));
-    for( auto key : scaffoldContigs) {
-        chosenPaths[key] = pathsMapLeft[key][0];
+    // scaffoldContigs.clear();
+    // scaffoldContigs.push_back(make_tuple("Ctg0", "Ctg3"));
+    // scaffoldContigs.push_back(make_tuple("Ctg3", "Ctg2"));
+    // scaffoldContigs.push_back(make_tuple("Ctg4", "Ctg5"));
+    // scaffoldContigs.push_back(make_tuple("Ctg5", "Ctg1"));
+
+    for( auto tapl : scaffoldContigs) {
+        cout << "da" << get<0>(tapl) << " " << get<1>(tapl) << endl;
     }
-
-    // for( auto tapl : scaffoldContigs) {
-    //     cout << "da" << get<0>(tapl) << " " << get<1>(tapl) << endl;
+    map<tuple<string, string>, vector<tuple<string, int> > > chosenPaths;
+    chosenPaths = mapConsensusPath(dividePathsIntoGroups(pathLengthsMap, 10));
+    // cout << "jaba" << endl;
+    // for( auto key : scaffoldContigs) {
+    //     cout << get<0>(key) << " " << get<1>(key) << endl;
+    //     chosenPaths[key] = pathsMapLeft[key][0];
     // }
     // for( auto tapl : chosenPaths) {
     //     cout << "ne" << get<0>(tapl.first) << " " << get<1>(tapl.first) << endl;
     // }
-
     vector<vector<tuple<string, int> > > finalOrder;
     finalOrder = buildFinalScaffoldOrder(chosenPaths, scaffoldContigs);
 

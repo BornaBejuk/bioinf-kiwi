@@ -96,6 +96,7 @@ string buildFastaString(vector<vector<tuple<string, int> > > finalOrder, map<str
 
     vector<string> contigsAppended;
 
+    int ctgCounter = 0;
     // string begin;
     // string end;
     // float ctgBeginLen;
@@ -152,6 +153,8 @@ string buildFastaString(vector<vector<tuple<string, int> > > finalOrder, map<str
                 flagMiddleAfter = 0;
                 flagMiddle = 1;
                 if( currentTarget != middle ) {
+                    fastaString = "\n>ctg" + to_string(ctgCounter) + "\n" + fastaString;
+                    ctgCounter += 1;
                     // in this case we dont have the same contig so we cant continue building but start again with new contig
                     contigsAppended.push_back(currentTarget);
 
@@ -209,8 +212,8 @@ string buildFastaString(vector<vector<tuple<string, int> > > finalOrder, map<str
             }
         }
     }
-
-    fastaString = ">final_path\n" + fastaString;
+    // reverse(fastaString.begin(), fastaString.end());
+    fastaString = ">ctg" + to_string(ctgCounter) + "\n" + fastaString;
     return fastaString;
 }
 
