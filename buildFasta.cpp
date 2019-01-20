@@ -97,13 +97,6 @@ string buildFastaString(vector<vector<tuple<string, int> > > finalOrder, map<str
     vector<string> contigsAppended;
 
     int ctgCounter = 0;
-    // string begin;
-    // string end;
-    // float ctgBeginLen;
-    // float ctgEndLen;
-    // float pathLen = 0.0;
-    // string currentTargetRead;
-    // string currentQueryRead;
     for( auto pair : finalOrder) {
         currentTarget = get<0>(pair[0]);
         currentTargetIndex = get<1>(pair[1]);
@@ -188,7 +181,6 @@ string buildFastaString(vector<vector<tuple<string, int> > > finalOrder, map<str
             leftIndex = 0;
             rightIndex = groupedRR[currentTarget][currentQuery][currentQueryIndex][3]; // OH2
 
-            // substringToInsert = fastaReads[currentTarget].substr(leftIndex, rightIndex);
             // remove left OH2
             // TODO check if this is goood, else fastaString.erase(rightIndex);
             fastaString = fastaString.substr(rightIndex);
@@ -201,8 +193,6 @@ string buildFastaString(vector<vector<tuple<string, int> > > finalOrder, map<str
 
         }
     }
-
-    // cout << "FIRst part over" << endl;
 
     if( contigsAppended.size() < keysCR.size()) {
         for( auto ctg : keysCR) {

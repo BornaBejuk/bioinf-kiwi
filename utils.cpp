@@ -25,7 +25,6 @@ void loadData(string path, vector<string> &queryNames, vector<int> &queryLens, v
     float sisum = 0.0;
     float counter = 0.0;
     if (inputFile.good()) {
-        // int current_number = 0;
         while (getline(inputFile, line)) {
             stringstream linestream(line);
             string qName;
@@ -52,7 +51,6 @@ void loadData(string path, vector<string> &queryNames, vector<int> &queryLens, v
             float si = resMatch / bLen;
             sisum += si;
             counter += 1;
-            // cout << si << endl;
             if( si > SImin) {
                 if( extendRight(qEnd, qLen, tEnd, tLen)) {
                     extensionSides.push_back(1);
@@ -75,7 +73,6 @@ void loadData(string path, vector<string> &queryNames, vector<int> &queryLens, v
             }
         }
     }
-
     cout << "AVG SI: " << sisum / counter << endl;
 }
 
@@ -101,7 +98,6 @@ void filterContained(vector<string> &queryNames, vector<int> &queryLens, vector<
         } else if( extendLeft(queryStarts[i], targetStarts[i])) {
             extensionSides.push_back(0);
         } else {
-            // cout << queryNames[i] << " " << targetNames[i] << " " << resMatches[i] << endl;
             queryNames.erase(queryNames.begin() + i);
             queryLens.erase(queryLens.begin() + i);
             queryStarts.erase(queryStarts.begin() + i);
@@ -132,11 +128,8 @@ void filterBySI(float SImin, vector<string> &queryNames, vector<int> &queryLens,
             vector<float> &targetStarts, vector<float> &targetEnds, vector<float> &resMatches,
             vector<float> &blockLens, vector<float> &extensionSides, vector<float> SI) {
 
-    // vector<string> names;
-    // copy_if (queryNames.begin(), queryNames.end(), std::back_inserter(names), [](int i){return i>=0;} );
     for( int i = 0; i < queryStarts.size(); i++) {
         if( SI[i] < SImin ) {
-
             queryNames.erase(queryNames.begin() + i);
             queryLens.erase(queryLens.begin() + i);
             queryStarts.erase(queryStarts.begin() + i);
@@ -159,8 +152,8 @@ void calculateOL(vector<float> &OL1, vector<float> &OL2, vector<float> &querySta
 
     for( int i = 0; i < queryStarts.size(); i++) {
         // TODO add - 1 to each because both are included, end and start
-        OL1.push_back(queryEnds[i] - queryStarts[i]);
-        OL2.push_back(targetEnds[i] - targetStarts[i]);
+        OL1.push_back(queryEnds[i] - queryStarts[i]-1);
+        OL2.push_back(targetEnds[i] - targetStarts[i]-1);
     }
 }
 

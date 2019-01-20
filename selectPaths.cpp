@@ -25,7 +25,6 @@ map<tuple<string, string>, vector<vector<tuple<string, int> > > > mapPaths(float
         path.erase(path.begin());
         path.pop_back();
         key = make_tuple(start, end);
-        // cout << get<0>(path[0]) << endl;
         pathsMap[key].push_back(path);
     }
 
@@ -50,7 +49,6 @@ map<tuple<string, string>, vector<tuple<vector<tuple<string, int> >, float> > > 
     for( auto key : pathsMap) {
         begin = get<0>(key.first);
         end = get<1>(key.first);
-        // cout << begin << " " << end << endl;
 
         for( auto path : key.second) {
             pathLen = 0.0;
@@ -61,7 +59,6 @@ map<tuple<string, string>, vector<tuple<vector<tuple<string, int> >, float> > > 
 
             currentQueryRead = get<0>(path.back());
             currentQueryIndex = get<1>(path.back());
-
             ctgEndLen = groupedCR[end][currentQueryRead][currentQueryIndex][6] + groupedCR[end][currentQueryRead][currentQueryIndex][5] + groupedCR[end][currentQueryRead][currentQueryIndex][4];
 
             pathLen += ctgBeginLen + ctgEndLen;
@@ -70,15 +67,11 @@ map<tuple<string, string>, vector<tuple<vector<tuple<string, int> >, float> > > 
                 currentTargetRead = get<0>(path[i]);
                 currentQueryRead = get<0>(path[i+1]);
                 currentQueryIndex = get<1>(path[i+1]);
-
                 // - OH2 + EL1
                 pathLen += groupedRR[currentTargetRead][currentQueryRead][currentQueryIndex][4] - groupedRR[currentTargetRead][currentQueryRead][currentQueryIndex][3];
             }
-            // cout << (int) pathLen << endl;
-
             pathLengthsMap[key.first].push_back(make_tuple(path, pathLen));
         }
-
     }
 
     return pathLengthsMap;

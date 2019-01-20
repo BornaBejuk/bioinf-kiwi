@@ -37,14 +37,6 @@ int main() {
     // string pathFastaReads = "data/BGrahamii-real/BGrahamii-reads.fastq";
     // string pathFastaOut = "data/BGrahamii-real/final.fasta";
 
-    // map<string, string> fastaReads1;
-    // fastaReads1 = loadFasta(pathFastaReads);
-
-    // map<string, string> fastaContigs1;
-    // fastaContigs1 = loadFasta(pathFastaCtgs);
-    // return 0;
-
-
     vector<string> queryNames;
     vector<int> queryLens;
     vector<float> queryStarts;
@@ -72,10 +64,6 @@ int main() {
     vector<float> ES2;
 
     loadData(pathCR, queryNames, queryLens, queryStarts, queryEnds, targetNames, targetLens, targetStarts, targetEnds, resMatches, blockLens, SI, SImin, extensionSides);
-    // filterContained(queryNames, queryLens, queryStarts, queryEnds, targetNames, targetLens, targetStarts, targetEnds, resMatches, blockLens, extensionSides);
-
-    // calculateSI(SI, resMatches, blockLens);
-    // filterBySI(SImin, queryNames, queryLens, queryStarts, queryEnds, targetNames, targetLens, targetStarts, targetEnds, resMatches, blockLens, extensionSides, SI);
     calculateOL(OL1, OL2, queryStarts, queryEnds, targetStarts, targetEnds);
     calculateOH(OH1, OH2, queryLens, queryStarts, queryEnds, targetLens, targetStarts, targetEnds, extensionSides);
     calculateEL(EL1, EL2, queryLens, queryStarts, queryEnds, targetLens, targetStarts, targetEnds, extensionSides);
@@ -119,16 +107,7 @@ int main() {
     ES1.clear();
     ES2.clear();
 
-    // auto startTime = Clock::now();
     loadData(pathRR, queryNames, queryLens, queryStarts, queryEnds, targetNames, targetLens, targetStarts, targetEnds, resMatches, blockLens, SI, SImin, extensionSides);
-    // timeIt(startTime, "filter contained");
-    // cout << queryNames.size() << endl;
-    // filterContained(queryNames, queryLens, queryStarts, queryEnds, targetNames, targetLens, targetStarts, targetEnds, resMatches, blockLens, extensionSides);
-    // cout << queryNames.size() << endl;
-    // calculateSI(SI, resMatches, blockLens);
-    // cout << "SI loaded" << endl;
-    // filterBySI(0.3, queryNames, queryLens, queryStarts, queryEnds, targetNames, targetLens, targetStarts, targetEnds, resMatches, blockLens, extensionSides, SI);
-
     calculateOL(OL1, OL2, queryStarts, queryEnds, targetStarts, targetEnds);
     calculateOH(OH1, OH2, queryLens, queryStarts, queryEnds, targetLens, targetStarts, targetEnds, extensionSides);
     calculateEL(EL1, EL2, queryLens, queryStarts, queryEnds, targetLens, targetStarts, targetEnds, extensionSides);
@@ -147,52 +126,15 @@ int main() {
     }
 
     cout << "RR loaded" << endl;
-    // cout << groupedRR["m161108_211237_00127_c101051402550000001823235612291637_s1_p0/100336/0_19619"]["m161103_175158_00127_c101051712550000001823235612291635_s1_p0/140004/0_2390"][0][0] << endl;
-    // for( auto x : groupedCR){
-    //     cout << x.first << " contains:" << endl;
-    //     for( auto y : x.second){
-    //         cout << y.first << ':' << y.second[0][1] << '\n';
-    //         // cout << y.second << '\n';
-    //         break;
-    //     }
-    //     break;
-    // //     cout << x.first << ' '  << x.second << ' ' << '\n';
-    // }
-    //
-    // for( auto x : groupedRR){
-    //     cout << x.first << " contains:" << endl;
-    //     for( auto y : x.second){
-    //         cout << y.first << ':' << y.second[0][1] << '\n';
-    //         // cout << y.second << '\n';
-    //         break;
-    //     }
-    //     break;
-    // //     cout << x.first << ' '  << x.second << ' ' << '\n';
-    // }
 
     map<float, vector<vector<tuple<string, int> > > > paths;
     int maxDepth = 40;
     int nTimes = 10;
     int branchingFactor = 4;
     int measureIndex = 6; // overlap score
-    // keysCR.clear();
-    // keysCR.push_back("ctg1");
-    // monteCarlo("ctg2", 0.0, keysCR, groupedCR, keysRR, groupedRR, maxDepth, nTimes);
 
     // paths = dfsApproach(keysCR, groupedCR, keysRR, groupedRR, maxDepth, branchingFactor, measureIndex);
     paths = monteCarloWrapper(keysCR, groupedCR, keysRR, groupedRR, maxDepth, nTimes);
-    // string read;
-    // int number;
-    // for( auto side : paths){
-    //     cout << side.first << " contains:" << endl;
-    //     for( auto p : side.second){
-    //         for( auto element : p) {
-    //             tie(read, number) = element;
-    //             cout << read << " " << number << '\n';
-    //         }
-    //         cout << endl;
-    //     }
-    // }
 
 
     // TODO concatenate them or change mapPaths to work with both paths
@@ -201,7 +143,6 @@ int main() {
     pathsMapLeft = mapPaths(0.0, paths);
     pathsMapRight = mapPaths(1.0, paths);
 
-    // paths are now in one map, regardless of extension side
     map<tuple<string, string>, vector<tuple<vector<tuple<string, int> >, float> > > pathLengthsMap;
     pathLengthsMap = calculatePathLengths(pathsMapLeft, groupedCR, groupedRR);
 
@@ -212,30 +153,14 @@ int main() {
     //     }
     // }
 
-    // string read;
-    // int number;
     cout << "Paths left: " << endl;
 
     for( auto key : pathsMapLeft){
         cout << get<0>(key.first) << " " << get<1>(key.first) << " paths:" << key.second.size() << endl;
-        // for( auto p : key.second){
-        //     for( auto element : p) {
-        //         tie(read, number) = element;
-        //         cout << read << " " << number << '\n';
-        //     }
-        //     cout << endl;
-        // }
     }
     cout << "Paths right: " << endl;
     for( auto key : pathsMapRight){
         cout << get<0>(key.first) << " " << get<1>(key.first) << " paths: " << key.second.size() << endl;
-        // for( auto p : key.second){
-        //     for( auto element : p) {
-        //         tie(read, number) = element;
-        //         cout << read << " " << number << '\n';
-        //     }
-        //     cout << endl;
-        // }
     }
 
 
@@ -290,15 +215,6 @@ int main() {
     fastaString = buildFastaString(finalOrder, groupedCR, groupedRR, fastaReads, fastaContigs, keysCR);
 
     saveFasta(fastaString, pathFastaOut);
-    // allPaths = monteCarlo(keysCR[2], 0, keysCR, groupedCR, keysRR, groupedRR, maxDepth);
-    // cout << proba[targetNames[0]][queryNames[0]][0] << '\n';
-    // cout << queryLens[0] << '\n';
-    // cout << targetLens[0] << '\n';
-    // cout << extensionSides[0] << '\n';
-    // cout << OL1[0] << '\n';
-    // cout << OH1[0] << ' ' << OH2[0] << '\n';
-    // cout << EL1[0] << ' ' << EL2[0] << '\n';
-    // cout << SI[0] << '\n';
 
     return 0;
 }
