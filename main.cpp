@@ -9,6 +9,7 @@
 #include "selectPaths.hpp"
 #include "scaffolding.hpp"
 #include "buildFasta.hpp"
+#include "dfsSearch.hpp"
 
 typedef std::chrono::high_resolution_clock Clock;
 
@@ -170,12 +171,15 @@ int main() {
     // }
 
     map<float, vector<vector<tuple<string, int> > > > paths;
-    int maxDepth = 70;
+    int maxDepth = 40;
     int nTimes = 10;
+    int branchingFactor = 4;
+    int measureIndex = 6; // overlap score
     // keysCR.clear();
     // keysCR.push_back("ctg1");
     // monteCarlo("ctg2", 0.0, keysCR, groupedCR, keysRR, groupedRR, maxDepth, nTimes);
 
+    // paths = dfsApproach(keysCR, groupedCR, keysRR, groupedRR, maxDepth, branchingFactor, measureIndex);
     paths = monteCarloWrapper(keysCR, groupedCR, keysRR, groupedRR, maxDepth, nTimes);
     // string read;
     // int number;

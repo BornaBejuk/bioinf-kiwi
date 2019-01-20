@@ -23,20 +23,7 @@ map<float, vector<vector<tuple<string, int> > > > monteCarloWrapper(vector<strin
 
     float extensionSide = 0.0;
 
-    // reverse(keysCR.begin(), keysCR.end());
-    // int number = keysCR.size() - 1;
     for( auto key : keysCR) {
-        // if( number == 0) {
-        //     break;
-        // }
-        // vector<string>::const_iterator first = keysCR.begin() + keysCR.size() - number;
-        // vector<string>::const_iterator last = keysCR.begin() + keysCR.size() - number + 1;
-        // number -= 1;
-        // vector<string> newVec(first, last);
-        // for( auto contig : newVec) {
-        //     cout << key << " newvec " << contig << endl;
-        // }
-        // paths = monteCarlo(key, extensionSide, newVec, groupedCR, keysRR, groupedRR, maxDepth, nTimes);
         paths = monteCarlo(key, extensionSide, keysCR, groupedCR, keysRR, groupedRR, maxDepth, nTimes);
         for( auto path : paths) {
             pathsMap[extensionSide].push_back(path);
@@ -45,16 +32,6 @@ map<float, vector<vector<tuple<string, int> > > > monteCarloWrapper(vector<strin
 
     extensionSide = 1.0;
     for( auto key : keysCR) {
-    //     if( number == 0) {
-    //         break;
-    //     }
-    //     vector<string>::const_iterator first = keysCR.begin() + keysCR.size() - number;
-    //     vector<string>::const_iterator last = keysCR.begin() + keysCR.size() - number + 1;
-    //     number -= 1;
-    //     vector<string> newVec(first, last);
-    //     for( auto contig : newVec) {
-    //         cout << key << " newvec " << contig << endl;
-    //     }
         paths = monteCarlo(key, extensionSide, keysCR, groupedCR, keysRR, groupedRR, maxDepth, nTimes);
         for( auto path : paths) {
             pathsMap[extensionSide].push_back(path);
@@ -70,55 +47,26 @@ vector<vector<tuple<string, int> > > monteCarlo(string start, float side, vector
 
     vector<vector<tuple<string, int> > > paths;
     vector<tuple<string, int> > path;
-    // int nTimes = 1000;
-    int nGoals = 0;
+
     int flag = 0;
-    // cout << "Begin MC for contig " << start << endl;
+
     for( int i = 0; i < nTimes; i++){
         flag = 0;
         if( groupedCR[start].size() == 0 ) {
             break;
         }
         path = mcSearch(start, side, keysCR, groupedCR, keysRR, groupedRR, maxDepth);
-        // vector<tuple<string, int> >::iterator row;
-        // vector<string>::iterator col;
-        // for (row = paths.begin(); row != paths.end(); row++) {
-            // cout << paths[row][0] << '\n';
-            // allPaths.push_back(paths[row]);
-            // for (col = row->begin(); col != row->end(); col++) {
-                // do stuff ...
-            // }
-        // }
         for( auto p1 : paths) {
+            // check if path already exists
             if( equal(p1.begin(), p1.end(), path.begin()) != 0) {
                 flag = 1;
-                // cout << "-----------------------------------------------" << endl;
-                // cout << "Found path:" << endl;
-                // string read;
-                // int number;
-                // for( auto element : path) {
-                    // tie(read, number) = element;
-                    // cout << read << " " << number << '\n';
-                // }
-                // cout << "Old path:" << endl;
-                // for( auto element : p1) {
-                    // tie(read, number) = element;
-                    // cout << read << " " << number << '\n';
-                // }
                 break;
             }
         }
+        // if path isn't a duplicate and size is bigger than 2, append it
         if( path.size() > 1 && flag == 0){
-            // string read;
-            // int number;
-            // for( auto element : path) {
-            //     tie(read, number) = element;
-            //     cout << read << " " << number << endl;
-            // }
-            nGoals += 1;
             paths.push_back(path);
         }
-        // cout << "Trial:" << i << " " << "Paths found:" << nGoals << endl;
     }
 
     return paths;
@@ -135,35 +83,32 @@ vector<tuple<string, int> > mcSearch(string start, float side, vector<string> ke
 
     path.push_back(make_tuple(start, -1));
 
-    tie(read, number) = getMCReadForContig(start, side, groupedCR);
-    // cout << read << ' ' << number << endl;
+    tie(read, number) = getMCReadForContig(start, side, groupedCR, 1);
+
     path.push_back(make_tuple(read, number));
     stack.push_back(read);
+
     while( !stack.empty()) {
         string currentTarget = stack.back();
         stack.pop_back();
         if( path.size() <= maxDepth) {
             if ( std::find(keysCR.begin(), keysCR.end(), currentTarget) != keysCR.end() ) {
-                cout << "Current path length: " << path.size() << endl;
-                // path.push_back(make_tuple(currentTarget, -1));
+                // cout << "Current path length: " << path.size() << endl;
                 return path;
             }
             else {
                 while(true) {
-                    tie(read, number) = getMCReadForRead(currentTarget, side, start, groupedCR, groupedRR, path);
+                    tie(read, number) = getMCReadForRead(currentTarget, side, start, groupedCR, groupedRR, path, 1);
                     if( number == -2) {
                         break;
                     }
+                    // check if we already visited that read
                     if ( std::find(path.begin(), path.end(), make_tuple(read ,number)) != path.end() ) {
-                        cout << "Duplicate!!!!!!!!!!!! " << read << number << endl;
-                        for(auto tapl : path){
-                            cout << get<0>(tapl) << get<1>(tapl) << endl;
-                        }
+                        continue;
                     } else {
                         break;
                     }
                 }
-                // cout << "Nasel sam:" << currentTarget << ' ' << read << number << endl;
                 path.push_back(make_tuple(read, number));
                 stack.push_back(read);
             }
@@ -174,17 +119,15 @@ vector<tuple<string, int> > mcSearch(string start, float side, vector<string> ke
 }
 
 // function which returns read for given contig using roulette wheel probability scheme
-tuple<string, int> getMCReadForContig(string contig, float side, map<string, map<string, vector<vector<float> > > > &groupedCR) {
+tuple<string, int> getMCReadForContig(string contig, float side, map<string, map<string, vector<vector<float> > > > &groupedCR, int measureIndex) {
 
     float sum = 0.0;
     for( auto query : groupedCR[contig]){
         for( int i = 0; i < query.second.size(); i++) {
-            // cout << i << endl;
             // pick ES
             if( side == query.second[i][0]){
-                if( query.second[i][1] > 0) {
-                    sum += query.second[i][1];
-                    // break;
+                if( query.second[i][measureIndex] > 0) {
+                    sum += query.second[i][measureIndex];
                 }
             }
         }
@@ -200,8 +143,8 @@ tuple<string, int> getMCReadForContig(string contig, float side, map<string, map
         for( int i = 0; i < query.second.size(); i++) {
             // pick ES
             if( side == query.second[i][0]){
-                if( query.second[i][1] > 0) {
-                    offset += query.second[i][1];
+                if( query.second[i][measureIndex] > 0) {
+                    offset += query.second[i][measureIndex];
                     if( offset > pick) {
                         return make_tuple(query.first, i);
                     }
@@ -214,7 +157,7 @@ tuple<string, int> getMCReadForContig(string contig, float side, map<string, map
 }
 
 // function which returns read for given read using roulette wheel probability scheme
-tuple<string, int> getMCReadForRead(string read, float side, string startContig, map<string, map<string, vector<vector<float> > > > &groupedCR, map<string, map<string, vector<vector<float> > > > &groupedRR, vector<tuple<string, int> > &path) {
+tuple<string, int> getMCReadForRead(string read, float side, string startContig, map<string, map<string, vector<vector<float> > > > &groupedCR, map<string, map<string, vector<vector<float> > > > &groupedRR, vector<tuple<string, int> > &path, int measureIndex) {
 
     // try to find contig == goal
     for( auto target : groupedCR) {
@@ -228,7 +171,6 @@ tuple<string, int> getMCReadForRead(string read, float side, string startContig,
             for( int i = 0; i < query.second.size(); i++) {
                 // if extends from other side
                 if( side != query.second[i][0]){
-                    // cout << "GOAL FOUND!" << target.first << endl;
                     // remove the last read from path
                     path.pop_back();
                     // append the last read with corrected queryIndex
@@ -239,16 +181,14 @@ tuple<string, int> getMCReadForRead(string read, float side, string startContig,
         }
     }
 
-
     float sum = 0.0;
 
     for( auto query : groupedRR[read]){
         for( int i = 0; i < query.second.size(); i++) {
             // pick ES
             if( side == query.second[i][0]){
-                if( query.second[i][1] > 0) {
-                    sum += query.second[i][1];
-                    // break;
+                if( query.second[i][measureIndex] > 0) {
+                    sum += query.second[i][measureIndex];
                 }
             }
         }
@@ -262,13 +202,10 @@ tuple<string, int> getMCReadForRead(string read, float side, string startContig,
 
     for( auto query : groupedRR[read]){
         for( int i = 0; i < query.second.size(); i++) {
-            // cout << side << " " << query.second[i][0] << endl;
             if( side == query.second[i][0]){
-                // cout << read << query.first << endl;
-                if( query.second[i][1] > 0) {
-                    offset += query.second[i][1];
+                if( query.second[i][measureIndex] > 0) {
+                    offset += query.second[i][measureIndex];
                     if( offset > pick) {
-                        // cout << "Read found!" << query.first << endl;
                         return make_tuple(query.first, i);
                     }
                 }
