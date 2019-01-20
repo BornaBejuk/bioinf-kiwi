@@ -52,7 +52,7 @@ int main() {
 
     vector<float> extensionSides; // 1 is right, 0 is left
     vector<float> SI;
-    float SImin = 0.8;
+    float SImin = 0.9;
     vector<float> OL1;
     vector<float> OL2;
     vector<float> OH1;
@@ -128,13 +128,29 @@ int main() {
     cout << "RR loaded" << endl;
 
     map<float, vector<vector<tuple<string, int> > > > paths;
-    int maxDepth = 40;
-    int nTimes = 10;
-    int branchingFactor = 4;
-    int measureIndex = 6; // overlap score
+    map<float, vector<vector<tuple<string, int> > > > pathsTmp;
 
-    // paths = dfsApproach(keysCR, groupedCR, keysRR, groupedRR, maxDepth, branchingFactor, measureIndex);
+    int maxDepth = 40;
+
+    int nTimes = 50;
     paths = monteCarloWrapper(keysCR, groupedCR, keysRR, groupedRR, maxDepth, nTimes);
+
+    // int branchingFactor = 5;
+    // int measureIndex = 6; // overlap score
+    // pathsTmp = dfsApproach(keysCR, groupedCR, keysRR, groupedRR, maxDepth, branchingFactor, measureIndex);
+    // for( auto side : paths) {
+    //     for( auto path : pathsTmp[side.first]){
+    //         side.second.push_back(path);
+    //     }
+    // }
+    //
+    // measureIndex = 1; // extension score
+    // pathsTmp = dfsApproach(keysCR, groupedCR, keysRR, groupedRR, maxDepth, branchingFactor, measureIndex);
+    // for( auto side : paths) {
+    //     for( auto path : pathsTmp[side.first]){
+    //         side.second.push_back(path);
+    //     }
+    // }
 
 
     // TODO concatenate them or change mapPaths to work with both paths
@@ -142,6 +158,15 @@ int main() {
     map<tuple<string, string>, vector<vector<tuple<string, int> > > >  pathsMapRight;
     pathsMapLeft = mapPaths(0.0, paths);
     pathsMapRight = mapPaths(1.0, paths);
+
+    cout << "Paths left: " << endl;
+    for( auto key : pathsMapLeft){
+        cout << get<0>(key.first) << " " << get<1>(key.first) << " paths:" << key.second.size() << endl;
+    }
+    cout << "Paths right: " << endl;
+    for( auto key : pathsMapRight){
+        cout << get<0>(key.first) << " " << get<1>(key.first) << " paths: " << key.second.size() << endl;
+    }
 
     map<tuple<string, string>, vector<tuple<vector<tuple<string, int> >, float> > > pathLengthsMap;
     pathLengthsMap = calculatePathLengths(pathsMapLeft, groupedCR, groupedRR);
@@ -153,15 +178,6 @@ int main() {
     //     }
     // }
 
-    cout << "Paths left: " << endl;
-
-    for( auto key : pathsMapLeft){
-        cout << get<0>(key.first) << " " << get<1>(key.first) << " paths:" << key.second.size() << endl;
-    }
-    cout << "Paths right: " << endl;
-    for( auto key : pathsMapRight){
-        cout << get<0>(key.first) << " " << get<1>(key.first) << " paths: " << key.second.size() << endl;
-    }
 
 
     vector<tuple<string, string> > scaffoldContigs;
@@ -173,12 +189,11 @@ int main() {
     // scaffoldContigs.push_back(make_tuple("Ctg4", "Ctg5"));
     // scaffoldContigs.push_back(make_tuple("Ctg5", "Ctg1"));
 
-    for( auto tapl : scaffoldContigs) {
-        cout << "da" << get<0>(tapl) << " " << get<1>(tapl) << endl;
-    }
+    // for( auto tapl : scaffoldContigs) {
+    //     cout << "da" << get<0>(tapl) << " " << get<1>(tapl) << endl;
+    // }
     map<tuple<string, string>, vector<tuple<string, int> > > chosenPaths;
     chosenPaths = mapConsensusPath(dividePathsIntoGroups(pathLengthsMap, 10));
-    // cout << "jaba" << endl;
     // for( auto key : scaffoldContigs) {
     //     cout << get<0>(key) << " " << get<1>(key) << endl;
     //     chosenPaths[key] = pathsMapLeft[key][0];
@@ -188,7 +203,6 @@ int main() {
     // }
     vector<vector<tuple<string, int> > > finalOrder;
     finalOrder = buildFinalScaffoldOrder(chosenPaths, scaffoldContigs);
-
 
     string currentTarget;
     string currentQuery;
