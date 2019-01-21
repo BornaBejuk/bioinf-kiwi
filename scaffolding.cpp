@@ -25,7 +25,8 @@ bool checkVector1(vector<tuple<string, string> > vec, string value) {
     }
 }
 
-vector<tuple<string, string> > getScaffoldContigs2(int ctgNumber, map<tuple<string, string>, vector<vector<tuple<string, int> > > > &pathsMapLeft, map<tuple<string, string>, vector<vector<tuple<string, int> > > > &pathsMapRight) {
+// constructs order of contigs and decides which contigs are connected
+vector<tuple<string, string> > getScaffoldContigs(int ctgNumber, map<tuple<string, string>, vector<vector<tuple<string, int> > > > &pathsMapLeft, map<tuple<string, string>, vector<vector<tuple<string, int> > > > &pathsMapRight) {
 
     vector<tuple<string, string> > contigs;
     map<tuple<string, string>, int> pathNumber;
@@ -34,27 +35,20 @@ vector<tuple<string, string> > getScaffoldContigs2(int ctgNumber, map<tuple<stri
 
     // save number of paths for each pair of contigs
     for( auto key : pathsMapLeft){
-        // cout << "Counting " << get<0>(key.first) << " " << get<1>(key.first) << " paths:" << key.second.size() << endl;
         pathNumber[key.first] = key.second.size();
     }
     for( auto key : pathsMapRight) {
-        // cout << "Left key " << get<0>(key.first) << get<1>(key.first) << endl;
         tuple<string, string> key2 = make_tuple(get<1>(key.first), get<0>(key.first));
         if( pathNumber.find(key2) == pathNumber.end()) {
-            // pathNumber[key2] = key.second.size();
             continue;
         } else {
             pathNumber[key2] += key.second.size();
         }
     }
-    // for( auto key : pathNumber) {
-    //     cout << get<0>(key.first) << " " << get<1>(key.first) << ":" << key.second << endl;
-    // }
 
     while( ctgNumber > (contigs.size() + 1)) {
         // find the pair with highest number of paths between them
         for( auto key : pathNumber) {
-            // cout << "Path considered " << get<0>(key.first) << " " << get<1>(key.first) << endl;
             if( key.second > maximum) {
                 maximum = key.second;
                 maximumKey = key.first;
@@ -63,8 +57,6 @@ vector<tuple<string, string> > getScaffoldContigs2(int ctgNumber, map<tuple<stri
         if( maximum == 0){
             break;
         }
-        // cout << "Max key " << get<0>(maximumKey) << " " << get<1>(maximumKey) << endl;
-        // cout << "Maximum " << maximum << endl;
         contigs.push_back(maximumKey);
         pathNumber.erase(maximumKey);
         for (auto it = pathNumber.cbegin(); it != pathNumber.cend(); ) {
@@ -94,36 +86,26 @@ vector<tuple<string, string> > getScaffoldContigs2(int ctgNumber, map<tuple<stri
     vector<tuple<string, string> > contigsFiltered;
     vector<vector<tuple<string, string> > > contigsVec;
     for( auto key : contigs) {
-        // cout << "----------------------------------" << endl;
-        // cout << "Key considered " << get<0>(key) << " " << get<1>(key) << endl;
         // if there are no my contigs yet, make one
         if( contigsVec.size() == 0) {
             tmpVec.clear();
             tmpVec.push_back(key);
             contigsVec.push_back(tmpVec);
-            // cout << "yup1 " << get<0>(key) << " " << get<1>(key) << endl;
         } else {
             // first check if it belongs to some contig
             for( int i = 0; i < contigsVec.size(); i++) {
                 if( checkVector0(contigsVec[i], get<1>(key))){
-                    // cout << "number 1 if" << endl;
                     if( checkVector1(contigsVec[i], get<0>(key))) {
                         // if both are inside, dont append it, otherwise we will get circle
-                        // cout << "already inside " << "yup " << get<0>(key) << " " << get<1>(key) << endl;
                         dontAppend = 1;
-                        // break;
                     } else {
-                        // cout << "this else" << endl;
                         // push current key and look if second ctg in key already has contig
                         for( int j = 0; j < contigsVec.size(); j++) {
                             if( i == j) {
                                 continue;
                             }
                             if( checkVector0(contigsVec[j], get<1>(key)) || checkVector1(contigsVec[j], get<0>(key))) {
-                                // cout << "this if" << endl;
                                 for( auto key2 : contigsVec[j]) {
-                                    // cout << "found it in another so copy " << get<0>(key) << " " << get<1>(key) << endl;
-                                    // cout << "found it in another so copy2 " << get<0>(key2) << " " << get<1>(key2) << endl;
                                     contigsVec[i].push_back(key2);
                                 }
                                 forDelete = j;
@@ -135,24 +117,17 @@ vector<tuple<string, string> > getScaffoldContigs2(int ctgNumber, map<tuple<stri
                         dontAppend = 1;
                     }
                 } else if( checkVector1(contigsVec[i], get<0>(key))){
-                    // cout << "2number 1 if" << endl;
                     if( checkVector0(contigsVec[i], get<1>(key))) {
                         // if both are inside, dont append it, otherwise we will get circle
-                        // cout << "2already inside " << "yup " << get<0>(key) << " " << get<1>(key) << endl;
                         dontAppend = 1;
-                        // break;
                     } else {
-                        // cout << "2this else" << endl;
                         // push current key and look if second ctg in key already has contig
                         for( int j = 0; j < contigsVec.size(); j++) {
                             if( i == j) {
                                 continue;
                             }
                             if( checkVector0(contigsVec[j], get<1>(key)) || checkVector1(contigsVec[j], get<0>(key))) {
-                                // cout << "2this if" << endl;
                                 for( auto key2 : contigsVec[j]) {
-                                    // cout << "2found it in another so copy " << get<0>(key) << " " << get<1>(key) << endl;
-                                    // cout << "2found it in another so copy2 " << get<0>(key2) << " " << get<1>(key2) << endl;
                                     contigsVec[i].push_back(key2);
                                 }
                                 forDelete = j;
@@ -181,23 +156,14 @@ vector<tuple<string, string> > getScaffoldContigs2(int ctgNumber, map<tuple<stri
                 forDelete = -1;
             }
         }
-
-        // for( auto vec : contigsVec) {
-        //     cout << "contig: " << endl;
-        //     for( auto key : vec) {
-        //         cout << "yup " << get<0>(key) << " " << get<1>(key) << endl;
-        //     }
-        // }
-
     }
 
     bool isFirst = true;
     vector<vector<tuple<string, string> > > contigsVec2;
     vector<tuple<string, string> > tmp2;
-    // cout << "EL finalo" << endl;
     for( auto vec : contigsVec) {
-        // cout << "contig: " << endl;
         for( auto key : vec) {
+            isFirst = true;
             first = get<0>(key);
             for( auto key2 : vec) {
                 if( key == key2) {
@@ -211,9 +177,7 @@ vector<tuple<string, string> > getScaffoldContigs2(int ctgNumber, map<tuple<stri
             if( isFirst) {
                 break;
             }
-            // cout << "yup " << get<0>(key) << " " << get<1>(key) << endl;
         }
-        // cout << "FIRST " << first << endl;
         while( tmp2.size() < vec.size() ) {
             for(auto key : vec) {
                 if( std::find(tmp2.begin(), tmp2.end(), key) != tmp2.end()) {
@@ -230,11 +194,8 @@ vector<tuple<string, string> > getScaffoldContigs2(int ctgNumber, map<tuple<stri
         tmp2.clear();
     }
     contigs.clear();
-    cout << "EL finalo 2" << endl;
     for( auto vec : contigsVec2) {
-        cout << "contig: " << endl;
         for( auto key : vec) {
-            cout << "yup " << get<0>(key) << " " << get<1>(key) << endl;
             contigs.push_back(key);
         }
     }

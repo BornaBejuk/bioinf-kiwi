@@ -17,13 +17,11 @@ typedef std::chrono::high_resolution_clock Clock;
 void loadData(string path, vector<string> &queryNames, vector<int> &queryLens, vector<float> &queryStarts,
             vector<float> &queryEnds, vector<string> &targetNames, vector<int> &targetLens,
             vector<float> &targetStarts, vector<float> &targetEnds, vector<float> &resMatches,
-            vector<float> &blockLens, vector<float> &SI, float SImin, vector<float> &extensionSides) {
+            vector<float> &blockLens, vector<float> &SI, float SImin, vector<float> &extensionSides, vector<float> &strands) {
 
     string line;
 
     ifstream inputFile(path);
-    float sisum = 0.0;
-    float counter = 0.0;
     if (inputFile.good()) {
         while (getline(inputFile, line)) {
             stringstream linestream(line);
@@ -49,8 +47,6 @@ void loadData(string path, vector<string> &queryNames, vector<int> &queryLens, v
             }
 
             float si = resMatch / bLen;
-            sisum += si;
-            counter += 1;
             if( si > SImin) {
                 if( extendRight(qEnd, qLen, tEnd, tLen)) {
                     extensionSides.push_back(1);
@@ -63,6 +59,11 @@ void loadData(string path, vector<string> &queryNames, vector<int> &queryLens, v
                 queryLens.push_back(qLen);
                 queryStarts.push_back(qStart);
                 queryEnds.push_back(qEnd);
+                if( strand == "+"){
+                    strands.push_back(0.0);
+                } else {
+                    strands.push_back(1.0);
+                }
                 targetLens.push_back(tLen);
                 targetNames.push_back(tName);
                 targetStarts.push_back(tStart);
@@ -73,7 +74,6 @@ void loadData(string path, vector<string> &queryNames, vector<int> &queryLens, v
             }
         }
     }
-    cout << "AVG SI: " << sisum / counter << endl;
 }
 
 // determines if target is extended to right

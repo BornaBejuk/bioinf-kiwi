@@ -21,7 +21,7 @@ using namespace std;
 // authors: Karlo Brajdic
 
 int main(int argc, char **argv) {
-	    string pathCR;
+	string pathCR;
     string pathRR;
     string pathFastaCtgs;
     string pathFastaReads;
@@ -29,6 +29,8 @@ int main(int argc, char **argv) {
     float SImin;
     int maxDepth;
     int nTimes;
+	bool useAvgSI;
+	int branchingFactor;
     if (argc == 2) {
         char* filename = argv[1];
         cout << filename << endl;
@@ -56,14 +58,24 @@ int main(int argc, char **argv) {
                 file >> maxDepth;
             } else if (value == "nTimes"){
                 file >> nTimes;
-            } else if (value == "end") {
+            } else if (value == "useAvgSI"){
+				string val;
+				file >> val;
+				if ((val == "false") || (val == "0")) {
+					useAvgSI = false;
+				} else {
+					useAvgSI = true;
+				}
+			} else if (value == "branchingFactor") {
+				file >> branchingFactor;
+			} else if (value == "end") {
                 break;
-            }
+			}
 
         }
-    } else if (argc == 17){
+    } else if (argc == 23){
         string value;
-        for (int i=1; i <= 15; i+=2) {
+        for (int i=1; i <= 21; i+=2) {
             value = argv[i];
             if (value == "pathCR"){
                 pathCR = argv[i+1];
@@ -81,42 +93,44 @@ int main(int argc, char **argv) {
                 maxDepth = atoi(argv[i+1]);
             } else if (value == "nTimes"){
                 nTimes = atoi(argv[i+1]);
+            } else if (value == "branchingFactor"){
+                branchingFactor = atoi(argv[i+1]);
+            } else if (value == "useAvgSI"){
+				if ((argv[i+1] == "false") || (argv[i+1] == "0")) {
+					useAvgSI = false;
+				} else {
+					useAvgSI = true;
+				}
             }
         }
     } else {
-    pathCR =  "data/EColi-synthetic/overlaps-c-r.paf";
-    pathRR = "data/EColi-synthetic/overlaps-r-r.paf";
-    pathFastaCtgs = "data/EColi-synthetic/ecoli_test_contigs.fasta";
-    pathFastaReads = "data/EColi-synthetic/ecoli_test_reads.fasta";
-    pathFastaOut = "data/EColi-synthetic/final.fasta";
-    SImin = 0.9;
-    maxDepth = 40;
-    nTimes = 50;
+        pathCR =  "data/EColi-synthetic/overlaps-c-r.paf";
+        pathRR = "data/EColi-synthetic/overlaps-r-r.paf";
+        pathFastaCtgs = "data/EColi-synthetic/ecoli_test_contigs.fasta";
+        pathFastaReads = "data/EColi-synthetic/ecoli_test_reads.fasta";
+        pathFastaOut = "data/EColi-synthetic/final.fasta";
+        // pathCR = "data/CJejuni-real/overlaps-c-r.paf";
+        // pathRR = "data/CJejuni-real/overlaps-r-r.paf";
+        // pathFastaCtgs = "data/CJejuni-real/CJejuni-contigs.fasta";
+        // pathFastaReads = "data/CJejuni-real/CJejuni-reads.fastq";
+        // pathFastaOut = "data/CJejuni-real/final.fasta";
+        // pathCR = "data/BGrahamii-real/overlaps-c-r.paf";
+        // pathRR = "data/BGrahamii-real/overlaps-r-r.paf";
+        // pathFastaCtgs = "data/BGrahamii-real/BGrahamii-contigs.fasta";
+        // pathFastaReads = "data/BGrahamii-real/BGrahamii-reads.fastq";
+        // pathFastaOut = "data/BGrahamii-real/final.fasta";
+        SImin = 0.9;
+        maxDepth = 50;
+        nTimes = 10;
+    	useAvgSI = true;
+    	branchingFactor = 1;
 	}
-
-    //string pathCR = "data/EColi-synthetic/overlaps-c-r.paf";
-    //string pathRR = "data/EColi-synthetic/overlaps-r-r.paf";
-    //string pathFastaCtgs = "data/EColi-synthetic/ecoli_test_contigs.fasta";
-    //string pathFastaReads = "data/EColi-synthetic/ecoli_test_reads.fasta";
-    //string pathFastaOut = "data/EColi-synthetic/final.fasta";
-
-    // string pathCR = "data/CJejuni-real/overlaps-c-r.paf";
-    // string pathRR = "data/CJejuni-real/overlaps-r-r.paf";
-    // string pathFastaCtgs = "data/CJejuni-real/CJejuni-contigs.fasta";
-    // string pathFastaReads = "data/CJejuni-real/CJejuni-reads.fastq";
-    // string pathFastaOut = "data/CJejuni-real/final.fasta";
-
-    // string pathCR = "data/BGrahamii-real/overlaps-c-r.paf";
-    // string pathRR = "data/BGrahamii-real/overlaps-r-r.paf";
-    // string pathFastaCtgs = "data/BGrahamii-real/BGrahamii-contigs.fasta";
-    // string pathFastaReads = "data/BGrahamii-real/BGrahamii-reads.fastq";
-    // string pathFastaOut = "data/BGrahamii-real/final.fasta";
 
     vector<string> queryNames;
     vector<int> queryLens;
     vector<float> queryStarts;
     vector<float> queryEnds;
-
+    vector<float> strands;
     vector<string> targetNames;
     vector<int> targetLens;
     vector<float> targetStarts;
@@ -127,7 +141,6 @@ int main(int argc, char **argv) {
 
     vector<float> extensionSides; // 1 is right, 0 is left
     vector<float> SI;
-    float SImin = 0.9;
     vector<float> OL1;
     vector<float> OL2;
     vector<float> OH1;
@@ -138,7 +151,7 @@ int main(int argc, char **argv) {
     vector<float> ES1;
     vector<float> ES2;
 
-    loadData(pathCR, queryNames, queryLens, queryStarts, queryEnds, targetNames, targetLens, targetStarts, targetEnds, resMatches, blockLens, SI, SImin, extensionSides);
+    loadData(pathCR, queryNames, queryLens, queryStarts, queryEnds, targetNames, targetLens, targetStarts, targetEnds, resMatches, blockLens, SI, SImin, extensionSides, strands);
     calculateOL(OL1, OL2, queryStarts, queryEnds, targetStarts, targetEnds);
     calculateOH(OH1, OH2, queryLens, queryStarts, queryEnds, targetLens, targetStarts, targetEnds, extensionSides);
     calculateEL(EL1, EL2, queryLens, queryStarts, queryEnds, targetLens, targetStarts, targetEnds, extensionSides);
@@ -147,7 +160,7 @@ int main(int argc, char **argv) {
 
     map<string, map<string, vector<vector<float> > > > groupedCR;
     for( int i = 0; i < queryNames.size(); i++) {
-        vector<float> tmp = {extensionSides[i], ES2[i], OH1[i], OH2[i], EL1[i], EL2[i], OL2[i], OS[i], SI[i]};
+        vector<float> tmp = {extensionSides[i], ES2[i], OH1[i], OH2[i], EL1[i], EL2[i], OL2[i], OS[i], SI[i], strands[i]};
         groupedCR[targetNames[i]][queryNames[i]].push_back(tmp);
     }
     vector<string> keysCR;
@@ -155,13 +168,13 @@ int main(int argc, char **argv) {
         keysCR.push_back(key.first);
     }
 
-    cout << "CR loaded" << endl;
+    cout << "Contig-read overlaps loaded" << endl;
 
     queryNames.clear();
     queryLens.clear();
     queryStarts.clear();
     queryEnds.clear();
-
+    strands.clear();
     targetNames.clear();
     targetLens.clear();
     targetStarts.clear();
@@ -182,7 +195,7 @@ int main(int argc, char **argv) {
     ES1.clear();
     ES2.clear();
 
-    loadData(pathRR, queryNames, queryLens, queryStarts, queryEnds, targetNames, targetLens, targetStarts, targetEnds, resMatches, blockLens, SI, SImin, extensionSides);
+    loadData(pathRR, queryNames, queryLens, queryStarts, queryEnds, targetNames, targetLens, targetStarts, targetEnds, resMatches, blockLens, SI, SImin, extensionSides, strands);
     calculateOL(OL1, OL2, queryStarts, queryEnds, targetStarts, targetEnds);
     calculateOH(OH1, OH2, queryLens, queryStarts, queryEnds, targetLens, targetStarts, targetEnds, extensionSides);
     calculateEL(EL1, EL2, queryLens, queryStarts, queryEnds, targetLens, targetStarts, targetEnds, extensionSides);
@@ -191,7 +204,7 @@ int main(int argc, char **argv) {
 
     map<string, map<string, vector<vector<float> > > > groupedRR;
     for( int i = 0; i < queryNames.size(); i++) {
-        vector<float> tmp = {extensionSides[i], ES2[i], OH1[i], OH2[i], EL1[i], EL2[i], OS[i], SI[i]};
+        vector<float> tmp = {extensionSides[i], ES2[i], OH1[i], OH2[i], EL1[i], EL2[i], OS[i], SI[i], strands[i]};
         groupedRR[targetNames[i]][queryNames[i]].push_back(tmp);
     }
 
@@ -200,17 +213,13 @@ int main(int argc, char **argv) {
         keysRR.push_back(key.first);
     }
 
-    cout << "RR loaded" << endl;
+    cout << "Read-read overlaps loaded" << endl;
 
     map<float, vector<vector<tuple<string, int> > > > paths;
     map<float, vector<vector<tuple<string, int> > > > pathsTmp;
 
-    //int maxDepth = 40;
-
-    //int nTimes = 50;
     paths = monteCarloWrapper(keysCR, groupedCR, keysRR, groupedRR, maxDepth, nTimes);
 
-    // int branchingFactor = 5;
     // int measureIndex = 6; // overlap score
     // pathsTmp = dfsApproach(keysCR, groupedCR, keysRR, groupedRR, maxDepth, branchingFactor, measureIndex);
     // for( auto side : paths) {
@@ -227,8 +236,8 @@ int main(int argc, char **argv) {
     //     }
     // }
 
+    cout << "Paths search over." << endl;
 
-    // TODO concatenate them or change mapPaths to work with both paths
     map<tuple<string, string>, vector<vector<tuple<string, int> > > >  pathsMapLeft;
     map<tuple<string, string>, vector<vector<tuple<string, int> > > >  pathsMapRight;
     pathsMapLeft = mapPaths(0.0, paths);
@@ -246,45 +255,24 @@ int main(int argc, char **argv) {
     map<tuple<string, string>, vector<tuple<vector<tuple<string, int> >, float> > > pathLengthsMap;
     pathLengthsMap = calculatePathLengths(pathsMapLeft, groupedCR, groupedRR);
 
-    // for( auto key : pathLengthsMap) {
-    //     for( auto tapl : key.second) {
-    //         float length = get<1>(tapl);
-    //         cout << get<0>(key.first) << "->" << get<1>(key.first) << ":" << (int) length << endl;
-    //     }
-    // }
-
-
+    cout << "Path lengths calculated." << endl;
 
     vector<tuple<string, string> > scaffoldContigs;
-    scaffoldContigs = getScaffoldContigs2(keysCR.size(), pathsMapLeft, pathsMapRight);
+    scaffoldContigs = getScaffoldContigs(keysCR.size(), pathsMapLeft, pathsMapRight);
 
-    // scaffoldContigs.clear();
-    // scaffoldContigs.push_back(make_tuple("Ctg0", "Ctg3"));
-    // scaffoldContigs.push_back(make_tuple("Ctg3", "Ctg2"));
-    // scaffoldContigs.push_back(make_tuple("Ctg4", "Ctg5"));
-    // scaffoldContigs.push_back(make_tuple("Ctg5", "Ctg1"));
-
-    // for( auto tapl : scaffoldContigs) {
-    //     cout << "da" << get<0>(tapl) << " " << get<1>(tapl) << endl;
-    // }
     map<tuple<string, string>, vector<tuple<string, int> > > chosenPaths;
-    bool useAvgSI = true;
     chosenPaths = mapConsensusPath(dividePathsIntoGroups(pathLengthsMap, 10), groupedCR, groupedRR, useAvgSI);
-    // for( auto key : scaffoldContigs) {
-    //     cout << get<0>(key) << " " << get<1>(key) << endl;
-    //     chosenPaths[key] = pathsMapLeft[key][0];
-    // }
-    // for( auto tapl : chosenPaths) {
-    //     cout << "ne" << get<0>(tapl.first) << " " << get<1>(tapl.first) << endl;
-    // }
+
     vector<vector<tuple<string, int> > > finalOrder;
     finalOrder = buildFinalScaffoldOrder(chosenPaths, scaffoldContigs);
+
+    cout << "Scaffold constructed." << endl;
 
     string currentTarget;
     string currentQuery;
     int currentTargetIndex;
     int currentQueryIndex;
-    cout << "Scaffold order:" << endl;
+    cout << "Scaffold order begin:" << endl;
     for( auto pair : finalOrder) {
         currentTarget = get<0>(pair[0]);
         currentTargetIndex = get<1>(pair[1]);
