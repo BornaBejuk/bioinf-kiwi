@@ -84,14 +84,24 @@ int main(int argc, char **argv) {
             }
         }
     } else {
-    pathCR =  "data/EColi-synthetic/overlaps-c-r.paf";
-    pathRR = "data/EColi-synthetic/overlaps-r-r.paf";
-    pathFastaCtgs = "data/EColi-synthetic/ecoli_test_contigs.fasta";
-    pathFastaReads = "data/EColi-synthetic/ecoli_test_reads.fasta";
-    pathFastaOut = "data/EColi-synthetic/final.fasta";
-    SImin = 0.9;
-    maxDepth = 40;
-    nTimes = 50;
+    // pathCR =  "data/EColi-synthetic/overlaps-c-r.paf";
+    // pathRR = "data/EColi-synthetic/overlaps-r-r.paf";
+    // pathFastaCtgs = "data/EColi-synthetic/ecoli_test_contigs.fasta";
+    // pathFastaReads = "data/EColi-synthetic/ecoli_test_reads.fasta";
+    // pathFastaOut = "data/EColi-synthetic/final.fasta";
+    pathCR = "data/CJejuni-real/overlaps-c-r.paf";
+    pathRR = "data/CJejuni-real/overlaps-r-r.paf";
+    pathFastaCtgs = "data/CJejuni-real/CJejuni-contigs.fasta";
+    pathFastaReads = "data/CJejuni-real/CJejuni-reads.fastq";
+    pathFastaOut = "data/CJejuni-real/final.fasta";
+    // pathCR = "data/BGrahamii-real/overlaps-c-r.paf";
+    // pathRR = "data/BGrahamii-real/overlaps-r-r.paf";
+    // pathFastaCtgs = "data/BGrahamii-real/BGrahamii-contigs.fasta";
+    // pathFastaReads = "data/BGrahamii-real/BGrahamii-reads.fastq";
+    // pathFastaOut = "data/BGrahamii-real/final.fasta";
+    SImin = 0.5;
+    maxDepth = 50;
+    nTimes = 100;
 	}
 
     //string pathCR = "data/EColi-synthetic/overlaps-c-r.paf";
@@ -116,7 +126,7 @@ int main(int argc, char **argv) {
     vector<int> queryLens;
     vector<float> queryStarts;
     vector<float> queryEnds;
-
+    vector<float> strands;
     vector<string> targetNames;
     vector<int> targetLens;
     vector<float> targetStarts;
@@ -127,7 +137,7 @@ int main(int argc, char **argv) {
 
     vector<float> extensionSides; // 1 is right, 0 is left
     vector<float> SI;
-    float SImin = 0.9;
+    // float SImin = 0.9;
     vector<float> OL1;
     vector<float> OL2;
     vector<float> OH1;
@@ -138,7 +148,7 @@ int main(int argc, char **argv) {
     vector<float> ES1;
     vector<float> ES2;
 
-    loadData(pathCR, queryNames, queryLens, queryStarts, queryEnds, targetNames, targetLens, targetStarts, targetEnds, resMatches, blockLens, SI, SImin, extensionSides);
+    loadData(pathCR, queryNames, queryLens, queryStarts, queryEnds, targetNames, targetLens, targetStarts, targetEnds, resMatches, blockLens, SI, SImin, extensionSides, strands);
     calculateOL(OL1, OL2, queryStarts, queryEnds, targetStarts, targetEnds);
     calculateOH(OH1, OH2, queryLens, queryStarts, queryEnds, targetLens, targetStarts, targetEnds, extensionSides);
     calculateEL(EL1, EL2, queryLens, queryStarts, queryEnds, targetLens, targetStarts, targetEnds, extensionSides);
@@ -147,7 +157,7 @@ int main(int argc, char **argv) {
 
     map<string, map<string, vector<vector<float> > > > groupedCR;
     for( int i = 0; i < queryNames.size(); i++) {
-        vector<float> tmp = {extensionSides[i], ES2[i], OH1[i], OH2[i], EL1[i], EL2[i], OL2[i], OS[i], SI[i]};
+        vector<float> tmp = {extensionSides[i], ES2[i], OH1[i], OH2[i], EL1[i], EL2[i], OL2[i], OS[i], SI[i], strands[i]};
         groupedCR[targetNames[i]][queryNames[i]].push_back(tmp);
     }
     vector<string> keysCR;
@@ -161,7 +171,7 @@ int main(int argc, char **argv) {
     queryLens.clear();
     queryStarts.clear();
     queryEnds.clear();
-
+    strands.clear();
     targetNames.clear();
     targetLens.clear();
     targetStarts.clear();
@@ -182,7 +192,7 @@ int main(int argc, char **argv) {
     ES1.clear();
     ES2.clear();
 
-    loadData(pathRR, queryNames, queryLens, queryStarts, queryEnds, targetNames, targetLens, targetStarts, targetEnds, resMatches, blockLens, SI, SImin, extensionSides);
+    loadData(pathRR, queryNames, queryLens, queryStarts, queryEnds, targetNames, targetLens, targetStarts, targetEnds, resMatches, blockLens, SI, SImin, extensionSides, strands);
     calculateOL(OL1, OL2, queryStarts, queryEnds, targetStarts, targetEnds);
     calculateOH(OH1, OH2, queryLens, queryStarts, queryEnds, targetLens, targetStarts, targetEnds, extensionSides);
     calculateEL(EL1, EL2, queryLens, queryStarts, queryEnds, targetLens, targetStarts, targetEnds, extensionSides);
@@ -191,7 +201,7 @@ int main(int argc, char **argv) {
 
     map<string, map<string, vector<vector<float> > > > groupedRR;
     for( int i = 0; i < queryNames.size(); i++) {
-        vector<float> tmp = {extensionSides[i], ES2[i], OH1[i], OH2[i], EL1[i], EL2[i], OS[i], SI[i]};
+        vector<float> tmp = {extensionSides[i], ES2[i], OH1[i], OH2[i], EL1[i], EL2[i], OS[i], SI[i], strands[i]};
         groupedRR[targetNames[i]][queryNames[i]].push_back(tmp);
     }
 
@@ -210,7 +220,7 @@ int main(int argc, char **argv) {
     //int nTimes = 50;
     paths = monteCarloWrapper(keysCR, groupedCR, keysRR, groupedRR, maxDepth, nTimes);
 
-    // int branchingFactor = 5;
+    // int branchingFactor = 2;
     // int measureIndex = 6; // overlap score
     // pathsTmp = dfsApproach(keysCR, groupedCR, keysRR, groupedRR, maxDepth, branchingFactor, measureIndex);
     // for( auto side : paths) {
@@ -245,7 +255,6 @@ int main(int argc, char **argv) {
 
     map<tuple<string, string>, vector<tuple<vector<tuple<string, int> >, float> > > pathLengthsMap;
     pathLengthsMap = calculatePathLengths(pathsMapLeft, groupedCR, groupedRR);
-
     // for( auto key : pathLengthsMap) {
     //     for( auto tapl : key.second) {
     //         float length = get<1>(tapl);
@@ -253,11 +262,8 @@ int main(int argc, char **argv) {
     //     }
     // }
 
-
-
     vector<tuple<string, string> > scaffoldContigs;
-    scaffoldContigs = getScaffoldContigs2(keysCR.size(), pathsMapLeft, pathsMapRight);
-
+    scaffoldContigs = getScaffoldContigs(keysCR.size(), pathsMapLeft, pathsMapRight);
     // scaffoldContigs.clear();
     // scaffoldContigs.push_back(make_tuple("Ctg0", "Ctg3"));
     // scaffoldContigs.push_back(make_tuple("Ctg3", "Ctg2"));
