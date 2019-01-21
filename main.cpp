@@ -73,9 +73,9 @@ int main(int argc, char **argv) {
 			}
 
         }
-    } else if (argc == 23){
+    } else if (argc == 21){
         string value;
-        for (int i=1; i <= 21; i+=2) {
+        for (int i=1; i <= 19; i+=2) {
             value = argv[i];
             if (value == "pathCR"){
                 pathCR = argv[i+1];
