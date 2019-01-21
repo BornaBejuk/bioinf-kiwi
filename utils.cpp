@@ -22,8 +22,6 @@ void loadData(string path, vector<string> &queryNames, vector<int> &queryLens, v
     string line;
 
     ifstream inputFile(path);
-    float sisum = 0.0;
-    float counter = 0.0;
     if (inputFile.good()) {
         while (getline(inputFile, line)) {
             stringstream linestream(line);
@@ -49,8 +47,6 @@ void loadData(string path, vector<string> &queryNames, vector<int> &queryLens, v
             }
 
             float si = resMatch / bLen;
-            sisum += si;
-            counter += 1;
             if( si > SImin) {
                 if( extendRight(qEnd, qLen, tEnd, tLen)) {
                     extensionSides.push_back(1);
@@ -78,7 +74,6 @@ void loadData(string path, vector<string> &queryNames, vector<int> &queryLens, v
             }
         }
     }
-    cout << "AVG SI: " << sisum / counter << endl;
 }
 
 // determines if target is extended to right

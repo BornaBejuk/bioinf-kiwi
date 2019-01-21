@@ -25,6 +25,7 @@ bool checkVector1(vector<tuple<string, string> > vec, string value) {
     }
 }
 
+// constructs order of contigs and decides which contigs are connected
 vector<tuple<string, string> > getScaffoldContigs(int ctgNumber, map<tuple<string, string>, vector<vector<tuple<string, int> > > > &pathsMapLeft, map<tuple<string, string>, vector<vector<tuple<string, int> > > > &pathsMapRight) {
 
     vector<tuple<string, string> > contigs;

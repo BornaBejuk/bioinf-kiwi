@@ -10,6 +10,8 @@
 
 using namespace std;
 
+// author: Karlo Brajdic
+
 string switchStrand(string s){
     string out = "";
     for( auto c : s){
