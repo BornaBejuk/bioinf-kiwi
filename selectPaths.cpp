@@ -130,7 +130,7 @@ bool sortbysec(const tuple<vector<tuple<string, int> >, float>& a, const tuple<v
 // author: Borna Bejuk
 // calculates average SI for overalps in a path
 float getAvgSIForPath(tuple<vector<tuple<string, int>>, float> path, map<string, map<string, vector<vector<float> > > > &groupedCR, map<string, map<string, vector<vector<float> > > > &groupedRR, string beginCtg, string endCtg) {
-    
+
     string currentTargetRead;
     int currentTargetIndex;
     string currentQueryRead;
@@ -142,7 +142,7 @@ float getAvgSIForPath(tuple<vector<tuple<string, int>>, float> path, map<string,
     int firstReadIndex = get<1>(pathReads[0]);
     string firstToEndRead = get<0>(pathReads[pathSize-1]);
     int firstToEndReadIndex = get<1>(pathReads[pathSize-1]);
- 
+
     float frontCtgReadSI = groupedCR[beginCtg][firstRead][firstReadIndex][8];
     float endCtgReadSI = groupedCR[endCtg][firstToEndRead][firstToEndReadIndex][8];
     float sumSI = frontCtgReadSI + endCtgReadSI;
@@ -164,80 +164,30 @@ float getAvgSIForPath(tuple<vector<tuple<string, int>>, float> path, map<string,
 map<tuple<string,string>, vector<tuple<string, int> > > mapConsensusPath(map<tuple<string, string>, vector<vector<tuple<vector<tuple<string, int>>, float> > > > mapOfGroups, map<string, map<string, vector<vector<float> > > > &groupedCR, map<string, map<string, vector<vector<float> > > > &groupedRR, bool useAvgSI) {
     map<tuple<string,string>, vector<tuple<string, int>>> mapOfChosenPaths;
     for (auto key: mapOfGroups) {
-        //vector<vector<tuple<vector<tuple<string, int>>, float>>> groups = mapOfGroups[key.first];
         string beginCtg = get<0>(key.first);
         string endCtg = get<1>(key.first);
         vector<int> vectorOfGroupSizes;
         for (auto group : key.second) {
             vectorOfGroupSizes.push_back(group.size());
         }
-        cout << get<0>(key.first) << " " << get<1>(key.first) << endl;
-        
-        int max_index = distance(vectorOfGroupSizes.begin(), max_element(vectorOfGroupSizes.begin(), vectorOfGroupSizes.end()));
-        cout << max_index << endl;
 
+        int max_index = distance(vectorOfGroupSizes.begin(), max_element(vectorOfGroupSizes.begin(), vectorOfGroupSizes.end()));
         vector<tuple<vector<tuple<string, int> >, float> > paths = key.second[max_index];
-        // for (auto path : paths) {
-        //     for (auto read : get<0>(path)) {
-        //         cout << get<0>(read) << " ";
-        //     }
-        //     cout << endl;
-        //     cout << "duljina patha" << get<1>(path) << endl;
-        // }
+        
         if (useAvgSI == true) {
-            cout << "u avg-u " << endl;
             vector<tuple<vector<tuple<string, int> >, float> > avgSIs;
             for (auto path : paths) {
-                // for (auto read : get<0>(path)) {
-                //     cout << get<0>(read) << " ";
-                // }
                 float avgSI = getAvgSIForPath(path, groupedCR, groupedRR, beginCtg, endCtg);
                 avgSIs.push_back(make_tuple(get<0>(path), avgSI));
-
-                // cout << endl;
-                // cout << "duljina patha" << get<1>(path) << endl;
             }
             sort(avgSIs.begin(), avgSIs.end(), sortbysec);
-            // for (auto path : avgSIs) {
-            //     for (auto read : get<0>(path)) {
-            //         cout << get<0>(read) << " ";
-            //     }
-            //     cout << endl;
-            //     cout << "avg si: " << get<1>(path) << endl;
-            // }
             vector<tuple<string, int> >  chosenPath = get<0>(avgSIs[avgSIs.size()-1]);
-            // cout << "Chosen path: " << endl;
-            // for (auto read : chosenPath) {
-            //     cout << get<0>(read) << " ";
-            // }
-            // cout << endl;
             mapOfChosenPaths[key.first] = chosenPath;
         } else {
-            cout << "u medijanu " << endl;
-            // cout << endl;
             int numOfPaths = paths.size();
-            // cout << "num of paths: " << numOfPaths << endl;
             int index = (int) numOfPaths / 2;
-            // cout << "index: " << index << endl;
             sort(paths.begin(), paths.end(), sortbysec);
-            // cout << endl;
-            // cout << "Sorted paths: " << endl;
-            // cout << endl;
-            // for (auto path : paths) {
-            //     for (auto read : get<0>(path)) {
-            //         cout << get<0>(read) << " ";
-            //     }
-            //     cout << endl;
-            //     cout << "duljina patha" << get<1>(path) << endl;
-            // }
-            // cout << "chosen path:" << endl;
             vector<tuple<string, int> >  chosenPath = get<0>(paths[index]);
-            // for (auto read : chosenPath){
-            //         cout << get<0>(read) << " ";
-            //     }
-            //     cout << endl;
-            //     cout << "duljina patha: " << get<1>(paths[index]) << endl;
-            // cout << endl;
             mapOfChosenPaths[key.first] = chosenPath;
         }
     }

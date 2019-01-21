@@ -152,8 +152,8 @@ void calculateOL(vector<float> &OL1, vector<float> &OL2, vector<float> &querySta
 
     for( int i = 0; i < queryStarts.size(); i++) {
         // TODO add - 1 to each because both are included, end and start
-        OL1.push_back(queryEnds[i] - queryStarts[i]-1);
-        OL2.push_back(targetEnds[i] - targetStarts[i]-1);
+        OL1.push_back(queryEnds[i] - queryStarts[i]);
+        OL2.push_back(targetEnds[i] - targetStarts[i]);
     }
 }
 

@@ -104,26 +104,26 @@ int main(int argc, char **argv) {
             }
         }
     } else {
-        pathCR =  "data/EColi-synthetic/overlaps-c-r.paf";
-        pathRR = "data/EColi-synthetic/overlaps-r-r.paf";
-        pathFastaCtgs = "data/EColi-synthetic/ecoli_test_contigs.fasta";
-        pathFastaReads = "data/EColi-synthetic/ecoli_test_reads.fasta";
-        pathFastaOut = "data/EColi-synthetic/final.fasta";
-        // pathCR = "data/CJejuni-real/overlaps-c-r.paf";
-        // pathRR = "data/CJejuni-real/overlaps-r-r.paf";
-        // pathFastaCtgs = "data/CJejuni-real/CJejuni-contigs.fasta";
-        // pathFastaReads = "data/CJejuni-real/CJejuni-reads.fastq";
-        // pathFastaOut = "data/CJejuni-real/final.fasta";
+        // pathCR =  "data/EColi-synthetic/overlaps-c-r.paf";
+        // pathRR = "data/EColi-synthetic/overlaps-r-r.paf";
+        // pathFastaCtgs = "data/EColi-synthetic/ecoli_test_contigs.fasta";
+        // pathFastaReads = "data/EColi-synthetic/ecoli_test_reads.fasta";
+        // pathFastaOut = "data/EColi-synthetic/final.fasta";
+        pathCR = "data/CJejuni-real/overlaps-c-r.paf";
+        pathRR = "data/CJejuni-real/overlaps-r-r.paf";
+        pathFastaCtgs = "data/CJejuni-real/CJejuni-contigs.fasta";
+        pathFastaReads = "data/CJejuni-real/CJejuni-reads.fastq";
+        pathFastaOut = "data/CJejuni-real/final.fasta";
         // pathCR = "data/BGrahamii-real/overlaps-c-r.paf";
         // pathRR = "data/BGrahamii-real/overlaps-r-r.paf";
         // pathFastaCtgs = "data/BGrahamii-real/BGrahamii-contigs.fasta";
         // pathFastaReads = "data/BGrahamii-real/BGrahamii-reads.fastq";
         // pathFastaOut = "data/BGrahamii-real/final.fasta";
-        SImin = 0.9;
-        maxDepth = 50;
-        nTimes = 10;
+        SImin = 0.5;
+        maxDepth = 40;
+        nTimes = 400;
     	useAvgSI = true;
-    	branchingFactor = 1;
+    	branchingFactor = 6;
 	}
 
     vector<string> queryNames;
@@ -220,21 +220,21 @@ int main(int argc, char **argv) {
 
     paths = monteCarloWrapper(keysCR, groupedCR, keysRR, groupedRR, maxDepth, nTimes);
 
-    // int measureIndex = 6; // overlap score
-    // pathsTmp = dfsApproach(keysCR, groupedCR, keysRR, groupedRR, maxDepth, branchingFactor, measureIndex);
-    // for( auto side : paths) {
-    //     for( auto path : pathsTmp[side.first]){
-    //         side.second.push_back(path);
-    //     }
-    // }
-    //
-    // measureIndex = 1; // extension score
-    // pathsTmp = dfsApproach(keysCR, groupedCR, keysRR, groupedRR, maxDepth, branchingFactor, measureIndex);
-    // for( auto side : paths) {
-    //     for( auto path : pathsTmp[side.first]){
-    //         side.second.push_back(path);
-    //     }
-    // }
+    int measureIndex = 6; // overlap score
+    pathsTmp = dfsApproach(keysCR, groupedCR, keysRR, groupedRR, maxDepth, branchingFactor, measureIndex);
+    for( auto side : paths) {
+        for( auto path : pathsTmp[side.first]){
+            side.second.push_back(path);
+        }
+    }
+
+    measureIndex = 1; // extension score
+    pathsTmp = dfsApproach(keysCR, groupedCR, keysRR, groupedRR, maxDepth, branchingFactor, measureIndex);
+    for( auto side : paths) {
+        for( auto path : pathsTmp[side.first]){
+            side.second.push_back(path);
+        }
+    }
 
     cout << "Paths search over." << endl;
 
