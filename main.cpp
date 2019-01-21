@@ -268,7 +268,8 @@ int main(int argc, char **argv) {
     //     cout << "da" << get<0>(tapl) << " " << get<1>(tapl) << endl;
     // }
     map<tuple<string, string>, vector<tuple<string, int> > > chosenPaths;
-    chosenPaths = mapConsensusPath(dividePathsIntoGroups(pathLengthsMap, 10));
+    bool useAvgSI = true;
+    chosenPaths = mapConsensusPath(dividePathsIntoGroups(pathLengthsMap, 10), groupedCR, groupedRR, useAvgSI);
     // for( auto key : scaffoldContigs) {
     //     cout << get<0>(key) << " " << get<1>(key) << endl;
     //     chosenPaths[key] = pathsMapLeft[key][0];
