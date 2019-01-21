@@ -170,10 +170,8 @@ map<tuple<string,string>, vector<tuple<string, int> > > mapConsensusPath(map<tup
         for (auto group : key.second) {
             vectorOfGroupSizes.push_back(group.size());
         }
-
         int max_index = distance(vectorOfGroupSizes.begin(), max_element(vectorOfGroupSizes.begin(), vectorOfGroupSizes.end()));
         vector<tuple<vector<tuple<string, int> >, float> > paths = key.second[max_index];
-        
         if (useAvgSI == true) {
             vector<tuple<vector<tuple<string, int> >, float> > avgSIs;
             for (auto path : paths) {
