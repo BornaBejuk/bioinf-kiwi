@@ -3,6 +3,9 @@
 #include <vector>
 #include <sstream>
 #include <map>
+#include <string>
+#include<stdio.h>
+#include<stdlib.h>
 
 #include "utils.hpp"
 #include "monteCarlo.hpp"
@@ -17,13 +20,85 @@ using namespace std;
 
 // authors: Karlo Brajdic
 
-int main() {
+int main(int argc, char **argv) {
+	    string pathCR;
+    string pathRR;
+    string pathFastaCtgs;
+    string pathFastaReads;
+    string pathFastaOut;
+    float SImin;
+    int maxDepth;
+    int nTimes;
+    if (argc == 2) {
+        char* filename = argv[1];
+        cout << filename << endl;
+        std::ifstream file(filename, std::ifstream::in);
 
-    string pathCR = "data/EColi-synthetic/overlaps-c-r.paf";
-    string pathRR = "data/EColi-synthetic/overlaps-r-r.paf";
-    string pathFastaCtgs = "data/EColi-synthetic/ecoli_test_contigs.fasta";
-    string pathFastaReads = "data/EColi-synthetic/ecoli_test_reads.fasta";
-    string pathFastaOut = "data/EColi-synthetic/final.fasta";
+        if (!file) {
+            cout << "parameter filename error" << endl;
+        }
+        string value;
+        while (1) {
+            file >> value;
+            if (value == "pathCR"){
+                file >> pathCR;
+            } else if (value == "pathRR"){
+                file >> pathRR;
+            } else if (value == "pathFastaCtgs"){
+                file >> pathFastaCtgs;
+            } else if (value == "pathFastaReads"){
+                file >> pathFastaReads;
+            } else if (value == "pathFastaOut"){
+                file >> pathFastaOut;
+            } else if (value == "SImin"){
+                file >> SImin;
+            } else if (value == "maxDepth"){
+                file >> maxDepth;
+            } else if (value == "nTimes"){
+                file >> nTimes;
+            } else if (value == "end") {
+                break;
+            }
+
+        }
+    } else if (argc == 17){
+        string value;
+        for (int i=1; i <= 15; i+=2) {
+            value = argv[i];
+            if (value == "pathCR"){
+                pathCR = argv[i+1];
+            } else if (value == "pathRR"){
+                pathRR = argv[i+1];
+            } else if (value == "pathFastaCtgs"){
+                pathFastaCtgs = argv[i+1];
+            } else if (value == "pathFastaReads"){
+                pathFastaReads = argv[i+1];
+            } else if (value == "pathFastaOut"){
+                pathFastaOut = argv[i+1];
+            } else if (value == "SImin"){
+                SImin = atof(argv[i+1]);
+            } else if (value == "maxDepth"){
+                maxDepth = atoi(argv[i+1]);
+            } else if (value == "nTimes"){
+                nTimes = atoi(argv[i+1]);
+            }
+        }
+    } else {
+    pathCR =  "data/EColi-synthetic/overlaps-c-r.paf";
+    pathRR = "data/EColi-synthetic/overlaps-r-r.paf";
+    pathFastaCtgs = "data/EColi-synthetic/ecoli_test_contigs.fasta";
+    pathFastaReads = "data/EColi-synthetic/ecoli_test_reads.fasta";
+    pathFastaOut = "data/EColi-synthetic/final.fasta";
+    SImin = 0.9;
+    maxDepth = 40;
+    nTimes = 50;
+	}
+
+    //string pathCR = "data/EColi-synthetic/overlaps-c-r.paf";
+    //string pathRR = "data/EColi-synthetic/overlaps-r-r.paf";
+    //string pathFastaCtgs = "data/EColi-synthetic/ecoli_test_contigs.fasta";
+    //string pathFastaReads = "data/EColi-synthetic/ecoli_test_reads.fasta";
+    //string pathFastaOut = "data/EColi-synthetic/final.fasta";
 
     // string pathCR = "data/CJejuni-real/overlaps-c-r.paf";
     // string pathRR = "data/CJejuni-real/overlaps-r-r.paf";
@@ -130,9 +205,9 @@ int main() {
     map<float, vector<vector<tuple<string, int> > > > paths;
     map<float, vector<vector<tuple<string, int> > > > pathsTmp;
 
-    int maxDepth = 40;
+    //int maxDepth = 40;
 
-    int nTimes = 50;
+    //int nTimes = 50;
     paths = monteCarloWrapper(keysCR, groupedCR, keysRR, groupedRR, maxDepth, nTimes);
 
     // int branchingFactor = 5;
