@@ -21,7 +21,7 @@ using namespace std;
 // authors: Karlo Brajdic
 
 int main(int argc, char **argv) {
-	    string pathCR;
+	string pathCR;
     string pathRR;
     string pathFastaCtgs;
     string pathFastaReads;
@@ -29,6 +29,9 @@ int main(int argc, char **argv) {
     float SImin;
     int maxDepth;
     int nTimes;
+	bool useAvgSI;
+	int branchingFactor;
+	int measureIndex;
     if (argc == 2) {
         char* filename = argv[1];
         cout << filename << endl;
@@ -56,14 +59,26 @@ int main(int argc, char **argv) {
                 file >> maxDepth;
             } else if (value == "nTimes"){
                 file >> nTimes;
-            } else if (value == "end") {
+            } else if (value == "useAvgSI"){
+				string val;
+				file >> val;
+				if ((val == "false") || (val == "0")) {
+					useAvgSI = false;
+				} else {
+					useAvgSI = true;
+				}
+			} else if (value == "branchingFactor") {
+				file >> branchingFactor;
+			} else if (value == "measureIndex") {
+				file >> measureIndex;
+			} else if (value == "end") {
                 break;
-            }
+			}
 
         }
-    } else if (argc == 17){
+    } else if (argc == 23){
         string value;
-        for (int i=1; i <= 15; i+=2) {
+        for (int i=1; i <= 21; i+=2) {
             value = argv[i];
             if (value == "pathCR"){
                 pathCR = argv[i+1];
@@ -81,9 +96,20 @@ int main(int argc, char **argv) {
                 maxDepth = atoi(argv[i+1]);
             } else if (value == "nTimes"){
                 nTimes = atoi(argv[i+1]);
+            } else if (value == "measureIndex"){
+                measureIndex = atoi(argv[i+1]);
+            } else if (value == "branchingFactor"){
+                branchingFactor = atoi(argv[i+1]);
+            } else if (value == "useAvgSI"){
+				if ((argv[i+1] == "false") || (argv[i+1] == "0")) {
+					useAvgSI = false;
+				} else {
+					useAvgSI = true;
+				}
             }
         }
     } else {
+<<<<<<< HEAD
     // pathCR =  "data/EColi-synthetic/overlaps-c-r.paf";
     // pathRR = "data/EColi-synthetic/overlaps-r-r.paf";
     // pathFastaCtgs = "data/EColi-synthetic/ecoli_test_contigs.fasta";
@@ -102,6 +128,19 @@ int main(int argc, char **argv) {
     SImin = 0.5;
     maxDepth = 50;
     nTimes = 100;
+=======
+    pathCR =  "data/EColi-synthetic/overlaps-c-r.paf";
+    pathRR = "data/EColi-synthetic/overlaps-r-r.paf";
+    pathFastaCtgs = "data/EColi-synthetic/ecoli_test_contigs.fasta";
+    pathFastaReads = "data/EColi-synthetic/ecoli_test_reads.fasta";
+    pathFastaOut = "data/EColi-synthetic/final.fasta";
+    SImin = 0.9;
+    maxDepth = 40;
+    nTimes = 50;
+	useAvgSI = true;
+	branchingFactor = 5;
+	measureIndex = 6;
+>>>>>>> 7835b518cf555fee7eb0cfa426a9dbbeb1afb202
 	}
 
     //string pathCR = "data/EColi-synthetic/overlaps-c-r.paf";
@@ -137,7 +176,11 @@ int main(int argc, char **argv) {
 
     vector<float> extensionSides; // 1 is right, 0 is left
     vector<float> SI;
+<<<<<<< HEAD
     // float SImin = 0.9;
+=======
+    //float SImin = 0.9;
+>>>>>>> 7835b518cf555fee7eb0cfa426a9dbbeb1afb202
     vector<float> OL1;
     vector<float> OL2;
     vector<float> OH1;
@@ -274,7 +317,8 @@ int main(int argc, char **argv) {
     //     cout << "da" << get<0>(tapl) << " " << get<1>(tapl) << endl;
     // }
     map<tuple<string, string>, vector<tuple<string, int> > > chosenPaths;
-    chosenPaths = mapConsensusPath(dividePathsIntoGroups(pathLengthsMap, 10));
+    //bool useAvgSI = true;
+    chosenPaths = mapConsensusPath(dividePathsIntoGroups(pathLengthsMap, 10), groupedCR, groupedRR, useAvgSI);
     // for( auto key : scaffoldContigs) {
     //     cout << get<0>(key) << " " << get<1>(key) << endl;
     //     chosenPaths[key] = pathsMapLeft[key][0];

@@ -11,6 +11,6 @@ map<tuple<string, string>, vector<tuple<vector<tuple<string, int> >, float> > > 
 
 map<tuple<string, string>, vector<vector<tuple<vector<tuple<string, int>>, float> > > > dividePathsIntoGroups(map<tuple<string, string>, vector<tuple<vector<tuple<string, int>>, float>>> pathLengthsMap, int smallestGroupNumber);
 
-map<tuple<string, string>, vector<tuple<string, int> > > mapConsensusPath(map<tuple<string, string>, vector<vector<tuple<vector<tuple<string, int>>, float> > > > mapOfGroups);
+map<tuple<string,string>, vector<tuple<string, int> > > mapConsensusPath(map<tuple<string, string>, vector<vector<tuple<vector<tuple<string, int>>, float> > > > mapOfGroups, map<string, map<string, vector<vector<float> > > > &groupedCR, map<string, map<string, vector<vector<float> > > > &groupedRR, bool useAvgSI);
 
 bool sortbysec(const tuple<vector<tuple<string, int> >, float>& a, const tuple<vector<tuple<string, int> >, float>& b);
